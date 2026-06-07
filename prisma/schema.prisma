@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id        String   @id @default(cuid())
+  name      String
+  rulebook          String   @default("Core facts about the clinic.")
+  chatInstructions  String   @default("Keep answers very short and use emojis. Ask to book an appointment.")
+  phoneInstructions String   @default("Speak slowly. Ask clarifying questions one at a time. Never use emojis.")
+  emailInstructions String   @default("Write professionally. Use a formal greeting and signature.")
+  phone     String?  // Optional Twilio phone number
+  emailAuth Boolean  @default(false) // Has connected Google Workspace?
+  
+  // Billing & Subscription Tracking
+  stripeCustomerId String?
+  billingStatus    String    @default("TRIAL") // TRIAL, ACTIVE, PAST_DUE, CANCELED
+  monthlyPrice     Int       @default(199)
+  lastPaidDate     DateTime? 
+  nextBillingDate  DateTime?
+
+  emails    Email[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Email {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  fromName  String
+  fromEmail String
+  subject   String
+  body      String
+  aiDraft   String?
+  status    String   @default("DRAFTED")
+  createdAt DateTime @default(now())
+}
