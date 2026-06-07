@@ -27,11 +27,67 @@ export async function POST(req: Request) {
       model: 'gemini-2.5-flash',
       config: {
         systemInstruction: systemPrompt,
+        tools: [
+          {
+            functionDeclarations: [
+              {
+                name: "book_appointment",
+                description: "Books an appointment on the clinic's Google Calendar. ONLY call this when the user has provided their name, phone number, and requested a specific date and time.",
+                parameters: {
+                  type: "OBJECT",
+                  properties: {
+                    date: {
+                      type: "STRING",
+                      description: "The date of the appointment in YYYY-MM-DD format.",
+                    },
+                    time: {
+                      type: "STRING",
+                      description: "The time of the appointment in HH:MM format (24-hour).",
+                    },
+                    patientName: {
+                      type: "STRING",
+                      description: "The name of the patient.",
+                    },
+                    patientPhone: {
+                      type: "STRING",
+                      description: "The phone number of the patient.",
+                    },
+                  },
+                  required: ["date", "time", "patientName", "patientPhone"],
+                },
+              },
+            ],
+          },
+        ],
       }
     });
 
     const lastUserMessage = messages[messages.length - 1].content;
-    const response = await chatSession.sendMessage({ message: lastUserMessage });
+    let response = await chatSession.sendMessage({ message: lastUserMessage });
+
+    // 3. Check if Gemini decided to call our Calendar Tool!
+    if (response.functionCalls && response.functionCalls.length > 0) {
+      const call = response.functionCalls[0];
+      if (call.name === "book_appointment" && clientId) {
+        const args = call.args as any;
+        const { bookAppointment } = await import('@/lib/googleCalendar');
+        
+        // Push the event to Google Calendar
+        const result = await bookAppointment(clientId, args.patientName, args.patientPhone, args.date, args.time);
+        
+        // Tell Gemini the result so it can reply to the user
+        response = await chatSession.sendMessage({
+          message: [
+            {
+              functionResponse: {
+                name: "book_appointment",
+                response: result,
+              }
+            }
+          ] as any
+        });
+      }
+    }
 
     return NextResponse.json({ reply: response.text });
 
