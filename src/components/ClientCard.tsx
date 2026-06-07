@@ -3,6 +3,35 @@
 import { useState } from "react";
 import { updateRulebook, updatePhone } from "@/app/actions/client";
 
+const ModalShell = ({ title, desc, value, onChange, onCancel, onSave, isSaving }: any) => (
+  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+    <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-2xl w-full p-6 shadow-2xl">
+      <h2 className="text-2xl font-bold mb-2">{title}</h2>
+      <p className="text-zinc-500 mb-6">{desc}</p>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full h-64 p-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl mb-6 font-mono text-sm outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+      <div className="flex justify-end gap-4">
+        <button 
+          onClick={onCancel}
+          className="px-6 py-2 rounded-lg font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+        >
+          Cancel
+        </button>
+        <button 
+          onClick={onSave}
+          disabled={isSaving}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+        >
+          {isSaving ? "Saving..." : "Save Changes"}
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
 export default function ClientCard({ client }: { client: any }) {
   const [activeModal, setActiveModal] = useState<string | null>(null);
   
@@ -20,34 +49,7 @@ export default function ClientCard({ client }: { client: any }) {
     setActiveModal(null);
   };
 
-  const ModalShell = ({ title, desc, value, onChange }: any) => (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl max-w-2xl w-full p-6 shadow-2xl">
-        <h2 className="text-2xl font-bold mb-2">{title}</h2>
-        <p className="text-zinc-500 mb-6">{desc}</p>
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full h-64 p-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl mb-6 font-mono text-sm outline-none focus:ring-2 focus:ring-indigo-500"
-        />
-        <div className="flex justify-end gap-4">
-          <button 
-            onClick={() => setActiveModal(null)}
-            className="px-6 py-2 rounded-lg font-medium hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-          >
-            Cancel
-          </button>
-          <button 
-            onClick={handleSave}
-            disabled={isSaving}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
-          >
-            {isSaving ? "Saving..." : "Save Changes"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+
 
   const getDaysDifference = (date: Date) => {
     const diffTime = date.getTime() - new Date().getTime();
@@ -97,6 +99,9 @@ export default function ClientCard({ client }: { client: any }) {
           desc={`Write the facts for ${client.name} (Prices, Address, FAQ). All tools will read this.`}
           value={rulebookText} 
           onChange={setRulebookText} 
+          onCancel={() => setActiveModal(null)}
+          onSave={handleSave}
+          isSaving={isSaving}
         />
       )}
       {activeModal === "chat" && (
@@ -105,6 +110,9 @@ export default function ClientCard({ client }: { client: any }) {
           desc={`How should the website widget talk? (e.g. use emojis, short responses)`}
           value={chatText} 
           onChange={setChatText} 
+          onCancel={() => setActiveModal(null)}
+          onSave={handleSave}
+          isSaving={isSaving}
         />
       )}
       {activeModal === "phone" && (
@@ -113,6 +121,9 @@ export default function ClientCard({ client }: { client: any }) {
           desc={`How should the voice AI speak? (e.g. speak slowly, never use emojis)`}
           value={phoneText} 
           onChange={setPhoneText} 
+          onCancel={() => setActiveModal(null)}
+          onSave={handleSave}
+          isSaving={isSaving}
         />
       )}
       {activeModal === "email" && (
@@ -121,6 +132,9 @@ export default function ClientCard({ client }: { client: any }) {
           desc={`How should the email bot write? (e.g. use formal signatures)`}
           value={emailText} 
           onChange={setEmailText} 
+          onCancel={() => setActiveModal(null)}
+          onSave={handleSave}
+          isSaving={isSaving}
         />
       )}
 
