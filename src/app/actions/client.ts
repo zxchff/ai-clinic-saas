@@ -39,10 +39,10 @@ export async function updateRulebook(id: string, newRulebook: string, chatInstru
   revalidatePath("/admin");
 }
 
-export async function updatePhone(id: string, phone: string) {
+export async function updatePhone(id: string, vapiPhoneNumber: string) {
   await prisma.client.update({
     where: { id },
-    data: { phone },
+    data: { vapiPhoneNumber },
   });
   revalidatePath("/admin");
 }

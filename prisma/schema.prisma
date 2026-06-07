@@ -19,6 +19,7 @@ model Client {
   
   // Google Calendar Integration
   googleRefreshToken String?
+  vapiPhoneNumber    String?
   calendarId         String?
   
   // Billing & Subscription Tracking

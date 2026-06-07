@@ -212,18 +212,18 @@ export default function ClientCard({ client }: { client: any }) {
             </button>
           </div>
           <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-            <label className="text-xs font-bold text-zinc-500 mb-1 block">Twilio Number</label>
+            <label className="text-xs font-bold text-zinc-500 mb-1 block">Vapi Phone Number</label>
             <div className="flex gap-2">
               <input 
-                id={`phone-input-${client.id}`}
+                id={`vapi-phone-input-${client.id}`}
                 type="text" 
-                defaultValue={client.phone || ""} 
+                defaultValue={client.vapiPhoneNumber || ""} 
                 placeholder="+1 (555) 000-0000" 
                 className="w-full text-sm bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 font-mono"
               />
               <button 
                 onClick={async (e) => {
-                  const input = document.getElementById(`phone-input-${client.id}`) as HTMLInputElement;
+                  const input = document.getElementById(`vapi-phone-input-${client.id}`) as HTMLInputElement;
                   const btn = e.currentTarget;
                   btn.textContent = "Saving...";
                   await updatePhone(client.id, input.value);
