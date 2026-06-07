@@ -3,7 +3,7 @@ import { google } from "googleapis";
 import prisma from "@/lib/prisma";
 
 export async function GET(req: Request) {
-  const { searchParams, origin } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
   const clientId = searchParams.get("state");
 
@@ -11,10 +11,14 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing code or state" }, { status: 400 });
   }
 
+  const protocol = req.headers.get("x-forwarded-proto") || "http";
+  const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "localhost:3000";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `${origin}/api/auth/google/callback`
+    `${appUrl}/api/auth/google/callback`
   );
 
   try {

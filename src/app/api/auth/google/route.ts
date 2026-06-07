@@ -2,17 +2,22 @@ import { NextResponse } from "next/server";
 import { google } from "googleapis";
 
 export async function GET(req: Request) {
-  const { searchParams, origin } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
   const clientId = searchParams.get("clientId");
 
   if (!clientId) {
     return NextResponse.json({ error: "Missing clientId" }, { status: 400 });
   }
 
+  // Get the actual domain from Vercel headers
+  const protocol = req.headers.get("x-forwarded-proto") || "http";
+  const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "localhost:3000";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `${origin}/api/auth/google/callback`
+    `${appUrl}/api/auth/google/callback`
   );
 
   const scopes = [
