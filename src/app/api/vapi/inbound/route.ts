@@ -40,8 +40,8 @@ If the user wants to book an appointment, use the book_appointment tool. You mus
       return NextResponse.json({
         assistant: {
           model: {
-            provider: "google",
-            model: "gemini-2.5-flash",
+            provider: "openai",
+            model: "gpt-4o-mini",
             messages: [
               {
                 role: "system",
