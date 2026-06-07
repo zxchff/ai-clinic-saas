@@ -23,8 +23,14 @@ export async function POST(req: Request) {
     }
 
     // 2. Format messages for Gemini using the dynamic Rulebook
+    const history = messages.slice(0, -1).map((msg: any) => ({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }]
+    }));
+
     const chatSession = ai.chats.create({
       model: 'gemini-2.5-flash',
+      history: history,
       config: {
         systemInstruction: systemPrompt,
         tools: [
