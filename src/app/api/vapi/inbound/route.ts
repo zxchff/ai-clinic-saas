@@ -48,42 +48,7 @@ If the user wants to book an appointment, use the book_appointment tool. You mus
                 content: systemPrompt,
               }
             ],
-            tools: [
-              {
-                type: "function",
-                messages: [
-                  {
-                    type: "request-start",
-                    content: "Let me check the calendar and book that for you. Give me one second.",
-                  },
-                  {
-                    type: "request-complete",
-                    content: "Okay, you are all booked!",
-                  },
-                  {
-                    type: "request-failed",
-                    content: "I'm sorry, I was unable to book the appointment. Please try again later.",
-                  }
-                ],
-                function: {
-                  name: "book_appointment",
-                  description: "Books an appointment on the clinic's Google Calendar.",
-                  parameters: {
-                    type: "object",
-                    properties: {
-                      patientName: { type: "string", description: "The full name of the patient." },
-                      patientPhone: { type: "string", description: "The patient's phone number." },
-                      date: { type: "string", description: "The date of the appointment (YYYY-MM-DD)." },
-                      time: { type: "string", description: "The time of the appointment (HH:MM in 24-hour format)." },
-                    },
-                    required: ["patientName", "patientPhone", "date", "time"],
-                  },
-                },
-                server: {
-                  url: `${appUrl}/api/vapi/webhook?clientId=${client.id}`,
-                },
-              }
-            ],
+            tools: [], // Temporarily empty to test connectivity
           },
           voice: {
             provider: "11labs",
