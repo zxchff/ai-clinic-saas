@@ -3,7 +3,7 @@ import { google } from "googleapis";
 import prisma from "@/lib/prisma";
 
 export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
+  const { searchParams, origin } = new URL(req.url);
   const code = searchParams.get("code");
   const clientId = searchParams.get("state");
 
@@ -14,7 +14,7 @@ export async function GET(req: Request) {
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/auth/google/callback`
+    `${origin}/api/auth/google/callback`
   );
 
   try {
