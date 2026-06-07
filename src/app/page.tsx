@@ -1,5 +1,6 @@
 import ChatWidget from "@/components/ChatWidget";
 import prisma from "@/lib/prisma";
+import Link from "next/link";
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
   const params = await searchParams;
@@ -50,10 +51,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ i
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <button className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-8 py-4 rounded-full font-medium text-lg hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+            <Link href="/admin" className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-8 py-4 rounded-full font-medium text-lg hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
               View Admin Dashboard
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-            </button>
+            </Link>
             <button className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white px-8 py-4 rounded-full font-medium text-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
               Watch Demo
