@@ -17,6 +17,10 @@ model Client {
   phone     String?  // Optional Twilio phone number
   emailAuth Boolean  @default(false) // Has connected Google Workspace?
   
+  // Google Calendar Integration
+  googleRefreshToken String?
+  calendarId         String?
+  
   // Billing & Subscription Tracking
   stripeCustomerId String?
   billingStatus    String    @default("TRIAL") // TRIAL, ACTIVE, PAST_DUE, CANCELED
