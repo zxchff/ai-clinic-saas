@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenAI, Type } from '@google/genai';
 import prisma from '@/lib/prisma';
 
 // Initialize the Google Gen AI SDK
@@ -34,22 +34,22 @@ export async function POST(req: Request) {
                 name: "book_appointment",
                 description: "Books an appointment on the clinic's Google Calendar. ONLY call this when the user has provided their name, phone number, and requested a specific date and time.",
                 parameters: {
-                  type: "OBJECT",
+                  type: Type.OBJECT,
                   properties: {
                     date: {
-                      type: "STRING",
+                      type: Type.STRING,
                       description: "The date of the appointment in YYYY-MM-DD format.",
                     },
                     time: {
-                      type: "STRING",
+                      type: Type.STRING,
                       description: "The time of the appointment in HH:MM format (24-hour).",
                     },
                     patientName: {
-                      type: "STRING",
+                      type: Type.STRING,
                       description: "The name of the patient.",
                     },
                     patientPhone: {
-                      type: "STRING",
+                      type: Type.STRING,
                       description: "The phone number of the patient.",
                     },
                   },
