@@ -94,7 +94,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     console.error("AI Error:", error);
     return NextResponse.json(
-      { reply: "I'm sorry, my brain is currently disconnected! Please make sure the API key is set." },
+      { reply: `ERROR: ${error.message || error.toString()}` },
       { status: 500 }
     );
   }
