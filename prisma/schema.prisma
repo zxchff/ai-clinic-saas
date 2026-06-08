@@ -28,8 +28,7 @@ model Client {
   monthlyPrice       Float     @default(99.00)
   lastPaidDate       DateTime?
   nextBillingDate    DateTime?
-  stripeCustomerId   String?   @unique
-  stripeSubscriptionId String? @unique
+  paypalSubscriptionId String? @unique
   
   // The user who owns this clinic
   userId             String?
