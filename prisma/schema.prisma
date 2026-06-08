@@ -10,7 +10,8 @@ datasource db {
 model Client {
   id        String   @id @default(cuid())
   name      String
-  rulebook          String   @default("Core facts about the clinic.")
+  industry  String?
+  rulebook          String   @db.Text
   chatInstructions  String   @default("Keep answers very short and use emojis. Ask to book an appointment.")
   phoneInstructions String   @default("Speak slowly. Ask clarifying questions one at a time. Never use emojis.")
   emailInstructions String   @default("Write professionally. Use a formal greeting and signature.")
