@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import DeployVoiceButton from "@/components/DeployVoiceButton";
+import VoiceSelector from "@/components/VoiceSelector";
 
 import { deployChatbot, deployEmailBot, undeployEngine } from "@/app/actions/vapi";
 
@@ -29,15 +30,16 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   async function updateAI(formData: FormData) {
     "use server";
     
+    const dataToUpdate: any = {};
+    if (formData.has("phoneInstructions")) dataToUpdate.phoneInstructions = formData.get("phoneInstructions") as string;
+    if (formData.has("chatInstructions")) dataToUpdate.chatInstructions = formData.get("chatInstructions") as string;
+    if (formData.has("emailInstructions")) dataToUpdate.emailInstructions = formData.get("emailInstructions") as string;
+    if (formData.has("countryCode")) dataToUpdate.countryCode = formData.get("countryCode") as string;
+    if (formData.has("voiceId")) dataToUpdate.voiceId = formData.get("voiceId") as string;
+
     await prisma.client.update({
       where: { id },
-      data: {
-        phoneInstructions: formData.get("phoneInstructions") as string,
-        chatInstructions: formData.get("chatInstructions") as string,
-        emailInstructions: formData.get("emailInstructions") as string,
-        countryCode: formData.get("countryCode") as string,
-        voiceId: formData.get("voiceId") as string,
-      }
+      data: dataToUpdate
     });
 
     revalidatePath(`/dashboard/client/${id}`);
@@ -70,19 +72,12 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
           </div>
         </header>
 
-        <form action={updateAI} className="space-y-12">
-          {/* Header Actions */}
-          <div className="flex justify-between items-center bg-zinc-900 border border-zinc-800 p-4 rounded-xl sticky top-4 z-10 shadow-2xl">
-            <p className="text-zinc-400 text-sm font-medium px-2">Configure the independent AI engines below.</p>
-            <button type="submit" className="bg-white hover:bg-zinc-200 text-black px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-[0_0_15px_rgba(255,255,255,0.15)] hover:shadow-[0_0_25px_rgba(255,255,255,0.3)]">
-              Save All Engines
-            </button>
-          </div>
-
+        <div className="space-y-12">
+          
           <div className="grid grid-cols-1 gap-8">
             
             {/* 1. Voice AI Engine */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden relative shadow-lg">
+            <form action={updateAI} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden relative shadow-lg">
               <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
               <div className="p-8">
                 <div className="flex justify-between items-start mb-6">
@@ -98,6 +93,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     <p className="text-zinc-400 mt-1">24/7 inbound and outbound phone receptionist.</p>
                   </div>
                   <div className="flex items-center gap-3">
+                    <button type="submit" className="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-lg font-bold transition-colors text-sm">
+                      Save Settings
+                    </button>
                     {client.vapiPhoneNumber ? (
                       <button formAction={async () => { "use server"; await undeployEngine(client.id, "VOICE"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
                         Stop Engine
@@ -118,40 +116,12 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-400 mb-2">Region (Phone Number)</label>
-                    <select 
-                      name="countryCode"
-                      defaultValue={client.countryCode || "+1"}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all text-sm"
-                    >
-                      <option value="+1">US/CA (+1)</option>
-                      <option value="+44">UK (+44)</option>
-                      <option value="+61">AU (+61)</option>
-                      <option value="+27">ZA (+27)</option>
-                      <option value="+91">IN (+91)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-400 mb-2">AI Voice Persona</label>
-                    <select 
-                      name="voiceId"
-                      defaultValue={client.voiceId || "rachel"}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all text-sm"
-                    >
-                      <option value="rachel">Rachel (Friendly Female)</option>
-                      <option value="drew">Drew (Professional Male)</option>
-                      <option value="mimi">Mimi (Energetic Female)</option>
-                      <option value="clyde">Clyde (Deep Male)</option>
-                    </select>
-                  </div>
-                </div>
+                <VoiceSelector defaultVoice={client.voiceId || "rachel"} defaultCountry={client.countryCode || "+1"} />
               </div>
-            </div>
+            </form>
 
             {/* 2. Website Chatbot Engine */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden relative shadow-lg">
+            <form action={updateAI} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden relative shadow-lg">
               <div className="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
               <div className="p-8">
                 <div className="flex justify-between items-start mb-6">
@@ -167,6 +137,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     <p className="text-zinc-400 mt-1">Embeddable smart widget for the client's website.</p>
                   </div>
                   <div className="flex items-center gap-3">
+                    <button type="submit" className="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-lg font-bold transition-colors text-sm">
+                      Save Settings
+                    </button>
                     {client.chatbotEmbedCode ? (
                       <button formAction={async () => { "use server"; await undeployEngine(client.id, "CHAT"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
                         Stop Engine
@@ -195,10 +168,10 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   />
                 </div>
               </div>
-            </div>
+            </form>
 
             {/* 3. Email Automation Engine */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden relative shadow-lg">
+            <form action={updateAI} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden relative shadow-lg">
               <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
               <div className="p-8">
                 <div className="flex justify-between items-start mb-6">
@@ -214,6 +187,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     <p className="text-zinc-400 mt-1">Auto-draft replies to inbound patient emails.</p>
                   </div>
                   <div className="flex items-center gap-3">
+                    <button type="submit" className="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-lg font-bold transition-colors text-sm">
+                      Save Settings
+                    </button>
                     {client.connectedEmail ? (
                       <button formAction={async () => { "use server"; await undeployEngine(client.id, "EMAIL"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
                         Stop Engine
@@ -242,10 +218,10 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   />
                 </div>
               </div>
-            </div>
+            </form>
 
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
