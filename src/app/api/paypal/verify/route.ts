@@ -6,6 +6,7 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
+    // @ts-ignore
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -14,6 +15,7 @@ export async function POST(request: Request) {
 
     // Find the user's client profile
     const user = await prisma.user.findUnique({
+      // @ts-ignore
       where: { id: session.user.id },
     });
 

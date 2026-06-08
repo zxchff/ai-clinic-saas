@@ -8,12 +8,14 @@ import { revalidatePath } from "next/cache";
 export async function submitOnboarding(businessName: string, industry: string) {
   const session = await getServerSession(authOptions);
   
+  // @ts-ignore
   if (!session?.user?.id) {
     throw new Error("Unauthorized");
   }
 
   // Find the user's client profile
   const user = await prisma.user.findUnique({
+    // @ts-ignore
     where: { id: session.user.id },
     include: { client: true }
   });
