@@ -3,6 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import CrmSpreadsheet from "@/components/CrmSpreadsheet";
 
 export const dynamic = "force-dynamic";
 
@@ -109,74 +110,7 @@ export default async function AgencyDashboard() {
         </div>
 
         {/* CRM Spreadsheet View */}
-        <div className="glass-panel rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-white/5 text-zinc-400 border-b border-white/10">
-                <tr>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Client Name</th>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Status</th>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Retainer</th>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Due Day</th>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Voice AI</th>
-                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {clients.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-zinc-500">
-                      No clients found. Click "Add New Client" to start building your empire.
-                    </td>
-                  </tr>
-                )}
-                {clients.map((client) => {
-                   const isOverdue = client.status === "ACTIVE" && client.paymentDueDate && today.getDate() > client.paymentDueDate && (!client.lastPaymentDate || client.lastPaymentDate.getMonth() !== today.getMonth());
-                   return (
-                  <tr key={client.id} className="hover:bg-white/5 transition-colors group">
-                    <td className="px-6 py-4 font-semibold text-white">
-                      {client.name}
-                      <div className="text-xs text-zinc-500 font-normal">{client.industry || "General"}</div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md border ${
-                        client.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                        client.status === 'PITCHING' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                        client.status === 'CHURNED' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                        'bg-zinc-800 text-zinc-400 border-zinc-700'
-                      }`}>
-                        {client.status || 'LEAD'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 font-mono text-zinc-300">
-                      ${client.monthlyRetainer?.toLocaleString() || '0'}/mo
-                    </td>
-                    <td className="px-6 py-4">
-                      {client.paymentDueDate ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-zinc-300 font-mono">Day {client.paymentDueDate}</span>
-                          {isOverdue && <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" title="Overdue!"></span>}
-                        </div>
-                      ) : <span className="text-zinc-600">-</span>}
-                    </td>
-                    <td className="px-6 py-4">
-                      {client.vapiPhoneNumber ? (
-                        <span className="text-emerald-400 font-mono text-xs bg-emerald-400/10 px-2 py-1 rounded">Live</span>
-                      ) : (
-                        <span className="text-zinc-600 text-xs">Offline</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Link href={`/dashboard/client/${client.id}`} className="text-blue-400 hover:text-blue-300 font-medium text-sm transition-colors opacity-0 group-hover:opacity-100">
-                        Open Command Center &rarr;
-                      </Link>
-                    </td>
-                  </tr>
-                )})}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <CrmSpreadsheet initialClients={clients} todayStr={today.toISOString()} />
       </div>
     </div>
   );

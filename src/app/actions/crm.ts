@@ -78,3 +78,27 @@ export async function globalKillSwitch(clientId: string) {
   revalidatePath(`/dashboard/client/${clientId}`);
   return { success: true };
 }
+
+export async function updateClientField(clientId: string, field: string, value: any) {
+  const allowedFields = ["status", "monthlyRetainer", "paymentDueDate", "followUp1", "followUp2", "followUp3"];
+  if (!allowedFields.includes(field)) {
+    return { error: "Invalid field" };
+  }
+
+  const data: any = {};
+  if (field === "monthlyRetainer" || field === "paymentDueDate") {
+    data[field] = parseInt(value, 10) || null;
+  } else if (field.startsWith("followUp")) {
+    data[field] = value ? new Date(value) : null;
+  } else {
+    data[field] = value;
+  }
+
+  await prisma.client.update({
+    where: { id: clientId },
+    data
+  });
+
+  revalidatePath("/dashboard");
+  return { success: true };
+}
