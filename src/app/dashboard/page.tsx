@@ -3,6 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import ClientCard from "@/components/ClientCard";
+import Paywall from "@/components/Paywall";
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +59,11 @@ export default async function DashboardPage() {
         {/* We reuse the exact same ClientCard component, but it only shows their specific clinic! */}
         <ClientCard client={client} />
       </div>
+
+      {/* Paywall Overlay */}
+      {client.billingStatus !== "ACTIVE" && (
+        <Paywall clientId={client.id} />
+      )}
     </div>
   );
 }
