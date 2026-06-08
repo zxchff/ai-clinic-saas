@@ -4,38 +4,78 @@ import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function deployVoiceAI(clientId: string) {
-  // Read the saved country code from the client
   const client = await prisma.client.findUnique({
     where: { id: clientId }
   });
-  const countryCode = client?.countryCode || "+1";
+  
+  if (!client) throw new Error("Client not found");
 
-  // SIMULATOR: We are pretending to call the Vapi & Twilio APIs here.
-  // In a real production environment with a Vapi API key, this would do:
-  // 1. POST https://api.vapi.ai/assistant to create the assistant with the client's rulebook
-  // 2. POST https://api.vapi.ai/phone-number to buy a Twilio number and attach the assistant
+  const vapiKey = process.env.VAPI_PRIVATE_KEY;
+  if (!vapiKey) {
+    throw new Error("VAPI_PRIVATE_KEY is missing from environment variables.");
+  }
 
-  // Simulate API latency (2.5 seconds to feel realistic)
-  await new Promise(resolve => setTimeout(resolve, 2500));
+  // 1. Create the Assistant on Vapi
+  const assistantResponse = await fetch("https://api.vapi.ai/assistant", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${vapiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      name: `${client.name || "Clinic"} Receptionist`,
+      model: {
+        provider: "openai",
+        model: "gpt-4o",
+        messages: [{ role: "system", content: client.phoneInstructions || client.rulebook || "You are a helpful receptionist." }]
+      },
+      voice: {
+        provider: "11labs",
+        voiceId: client.voiceId || "rachel"
+      }
+    })
+  });
 
-  // Generate a realistic looking fake phone number for the demo
-  const areaCode = Math.floor(Math.random() * 800) + 200;
-  const prefix = Math.floor(Math.random() * 800) + 200;
-  const line = Math.floor(Math.random() * 9000) + 1000;
-  const fakePhoneNumber = `${countryCode} (${areaCode}) ${prefix}-${line}`;
+  const assistant = await assistantResponse.json();
+  if (assistant.error) {
+    console.error("Vapi Assistant Error:", assistant);
+    throw new Error(assistant.message || "Failed to create Vapi assistant");
+  }
 
-  // Update the database to show the provisioned number
+  // 2. Buy a Phone Number and attach it to the Assistant
+  const phoneResponse = await fetch("https://api.vapi.ai/phone-number", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${vapiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      provider: "vapi",
+      numberDesiredAreaCode: "937", // Guaranteed to work based on Vapi hints
+      assistantId: assistant.id
+    })
+  });
+
+  const phone = await phoneResponse.json();
+  if (phone.error) {
+    console.error("Vapi Phone Error:", phone);
+    throw new Error(phone.message || "Failed to purchase Vapi phone number");
+  }
+
+  const realPhoneNumber = phone.number;
+
+  // 3. Update the database to show the real provisioned number
   await prisma.client.update({
     where: { id: clientId },
     data: {
-      vapiPhoneNumber: fakePhoneNumber,
+      vapiPhoneNumber: realPhoneNumber,
     }
   });
 
   // Tell Next.js to refresh the client detail page so the new number shows up instantly
   revalidatePath(`/dashboard/client/${clientId}`);
   
-  return { success: true, phoneNumber: fakePhoneNumber };
+  return { success: true, phoneNumber: realPhoneNumber };
 }
 
 export async function deployChatbot(clientId: string) {
