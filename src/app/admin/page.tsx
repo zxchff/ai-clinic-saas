@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import { createClient, deleteClient } from "@/app/actions/client";
 import ClientCard from "@/components/ClientCard";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboard() {
   const clients = await prisma.client.findMany({
     orderBy: { createdAt: "desc" },
