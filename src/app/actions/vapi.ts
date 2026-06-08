@@ -3,7 +3,7 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function deployVoiceAI(clientId: string) {
+export async function deployVoiceAI(clientId: string, countryCode: string = "+1") {
   // SIMULATOR: We are pretending to call the Vapi & Twilio APIs here.
   // In a real production environment with a Vapi API key, this would do:
   // 1. POST https://api.vapi.ai/assistant to create the assistant with the client's rulebook
@@ -16,7 +16,7 @@ export async function deployVoiceAI(clientId: string) {
   const areaCode = Math.floor(Math.random() * 800) + 200;
   const prefix = Math.floor(Math.random() * 800) + 200;
   const line = Math.floor(Math.random() * 9000) + 1000;
-  const fakePhoneNumber = `+1 (${areaCode}) ${prefix}-${line}`;
+  const fakePhoneNumber = `${countryCode} (${areaCode}) ${prefix}-${line}`;
 
   // Update the database to show the provisioned number
   await prisma.client.update({
