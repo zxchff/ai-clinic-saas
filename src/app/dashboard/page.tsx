@@ -19,16 +19,21 @@ export default async function DashboardPage() {
     where: { userId: session.user.id },
   });
 
-  // If this is a brand new user, create a blank clinic for them automatically
+  // If this is a brand new user, create a blank profile for them automatically
   if (!client) {
     client = await prisma.client.create({
       data: {
-        name: `${session.user.name}'s Clinic`,
+        name: `${session.user.name}'s Business`,
         rulebook: "You are a helpful AI receptionist.",
-        // @ts-ignore
         userId: session.user.id,
       },
     });
+    redirect("/onboarding");
+  }
+
+  // If they have a client profile but haven't set an industry yet, force them to onboarding
+  if (!client.industry) {
+    redirect("/onboarding");
   }
 
   return (
