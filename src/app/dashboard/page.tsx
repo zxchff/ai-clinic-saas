@@ -52,8 +52,10 @@ export default async function AgencyDashboard() {
       }
     }
     
-    if (c.nextFollowUpDate && c.nextFollowUpDate <= today && c.status !== "ACTIVE") {
-      followUpCount++;
+    if (c.status !== "ACTIVE") {
+      if (c.followUp1 && c.followUp1 <= today) followUpCount++;
+      if (c.followUp2 && c.followUp2 <= today) followUpCount++;
+      if (c.followUp3 && c.followUp3 <= today) followUpCount++;
     }
   });
 

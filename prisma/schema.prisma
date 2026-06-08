@@ -43,7 +43,9 @@ model Client {
   monthlyRetainer    Int?     @default(0)
   paymentDueDate     Int?     // Day of the month (1-31)
   lastPaymentDate    DateTime?
-  nextFollowUpDate   DateTime?
+  followUp1          DateTime?
+  followUp2          DateTime?
+  followUp3          DateTime?
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

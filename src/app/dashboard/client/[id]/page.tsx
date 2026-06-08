@@ -8,7 +8,7 @@ import DeployVoiceButton from "@/components/DeployVoiceButton";
 import VoiceSelector from "@/components/VoiceSelector";
 
 import { deployChatbot, deployEmailBot, undeployEngine } from "@/app/actions/vapi";
-import { updateCRMFields } from "@/app/actions/crm";
+import { updateCRMFields, deleteClient, globalKillSwitch } from "@/app/actions/crm";
 
 export const dynamic = "force-dynamic";
 
@@ -66,10 +66,13 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
           
           <div className="flex gap-3">
             <DeployVoiceButton clientId={client.id} />
-            <button className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-              Deploy Chatbot
-            </button>
+            
+            {/* Global Kill Switch */}
+            <form action={async () => { "use server"; await globalKillSwitch(client.id); }}>
+              <button type="submit" className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition-colors text-sm shadow-lg shadow-red-900/20">
+                🛑 GLOBAL KILL SWITCH
+              </button>
+            </form>
           </div>
         </header>
 
@@ -108,6 +111,22 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
               <div>
                 <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Last Payment Date</label>
                 <input type="date" name="lastPaymentDate" defaultValue={client.lastPaymentDate ? client.lastPaymentDate.toISOString().split('T')[0] : ""} className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:border-amber-500" />
+              </div>
+            </div>
+            
+            {/* 3-Step Follow Up */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 relative z-10 border-t border-white/5 pt-6">
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Follow-Up 1</label>
+                <input type="date" name="followUp1" defaultValue={client.followUp1 ? client.followUp1.toISOString().split('T')[0] : ""} className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:border-amber-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Follow-Up 2</label>
+                <input type="date" name="followUp2" defaultValue={client.followUp2 ? client.followUp2.toISOString().split('T')[0] : ""} className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:border-amber-500" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Follow-Up 3</label>
+                <input type="date" name="followUp3" defaultValue={client.followUp3 ? client.followUp3.toISOString().split('T')[0] : ""} className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:border-amber-500" />
               </div>
             </div>
           </form>
@@ -269,6 +288,23 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                 </div>
               </div>
             </form>
+
+            {/* DANGER ZONE - DELETE CLIENT */}
+            <div className="mt-12 p-8 border border-red-900/30 rounded-2xl bg-red-950/10">
+              <h3 className="text-red-500 font-bold text-lg mb-2">Danger Zone</h3>
+              <p className="text-zinc-400 text-sm mb-6">Deleting a client will permanently destroy all their AI engines, prompt settings, and CRM data. This action cannot be reversed.</p>
+              
+              <form action={async (formData: FormData) => { 
+                "use server"; 
+                const p = formData.get("passcode") as string;
+                await deleteClient(client.id, p); 
+              }} className="flex gap-4 items-center">
+                <input type="password" name="passcode" placeholder="Master Password" required className="bg-zinc-900 border border-red-900/50 rounded-lg px-4 py-2 text-red-100 focus:outline-none focus:border-red-500" />
+                <button type="submit" className="bg-red-900/50 hover:bg-red-600 text-white border border-red-800 px-6 py-2 rounded-lg font-bold transition-colors">
+                  Permanently Delete Client
+                </button>
+              </form>
+            </div>
 
           </div>
         </div>
