@@ -8,6 +8,7 @@ import DeployVoiceButton from "@/components/DeployVoiceButton";
 import VoiceSelector from "@/components/VoiceSelector";
 
 import { deployChatbot, deployEmailBot, undeployEngine } from "@/app/actions/vapi";
+import { updateCRMFields } from "@/app/actions/crm";
 
 export const dynamic = "force-dynamic";
 
@@ -74,6 +75,43 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
 
         <div className="space-y-12">
           
+          {/* CRM SETTINGS PANEL */}
+          <form action={updateCRMFields.bind(null, client.id)} className="glass-panel rounded-2xl p-6 border border-white/5 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
+            <div className="flex justify-between items-center mb-6 relative z-10">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                📊 CRM & Billing Settings
+              </h2>
+              <button type="submit" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-bold transition-colors text-sm border border-white/10">
+                Save CRM Data
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Lead Status</label>
+                <select name="status" defaultValue={client.status || "LEAD"} className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:border-amber-500">
+                  <option value="LEAD">Lead (Prospect)</option>
+                  <option value="PITCHING">Pitching (In Talks)</option>
+                  <option value="ACTIVE">Active (Paying)</option>
+                  <option value="CHURNED">Churned (Cancelled)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Monthly Retainer ($)</label>
+                <input type="number" name="monthlyRetainer" defaultValue={client.monthlyRetainer || 0} className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:border-emerald-500 font-mono" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Payment Due Day (1-31)</label>
+                <input type="number" min="1" max="31" name="paymentDueDate" defaultValue={client.paymentDueDate || ""} className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:border-amber-500 font-mono" />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Last Payment Date</label>
+                <input type="date" name="lastPaymentDate" defaultValue={client.lastPaymentDate ? client.lastPaymentDate.toISOString().split('T')[0] : ""} className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-zinc-100 focus:outline-none focus:border-amber-500" />
+              </div>
+            </div>
+          </form>
+
           <div className="grid grid-cols-1 gap-8">
             
             {/* 1. Voice AI Engine */}

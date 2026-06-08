@@ -38,8 +38,15 @@ model Client {
   user               User?     @relation(fields: [userId], references: [id])
 
   emails    Email[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  // Agency CRM Features
+  status             String?  @default("LEAD") // LEAD, PITCHING, ACTIVE, CHURNED
+  monthlyRetainer    Int?     @default(0)
+  paymentDueDate     Int?     // Day of the month (1-31)
+  lastPaymentDate    DateTime?
+  nextFollowUpDate   DateTime?
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }
 
 // NextAuth Models

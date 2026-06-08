@@ -31,68 +31,149 @@ export default async function AgencyDashboard() {
     orderBy: { createdAt: 'desc' }
   });
 
+  // Calculate CRM Stats
+  let totalMRR = 0;
+  let overdueCount = 0;
+  let followUpCount = 0;
+  
+  const today = new Date();
+  
+  clients.forEach(c => {
+    if (c.status === "ACTIVE" && c.monthlyRetainer) {
+      totalMRR += c.monthlyRetainer;
+    }
+    
+    if (c.status === "ACTIVE" && c.paymentDueDate) {
+      const currentDay = today.getDate();
+      if (currentDay > c.paymentDueDate) {
+         if (!c.lastPaymentDate || c.lastPaymentDate.getMonth() !== today.getMonth() || c.lastPaymentDate.getFullYear() !== today.getFullYear()) {
+             overdueCount++;
+         }
+      }
+    }
+    
+    if (c.nextFollowUpDate && c.nextFollowUpDate <= today && c.status !== "ACTIVE") {
+      followUpCount++;
+    }
+  });
+
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 p-8">
-      <div className="max-w-6xl mx-auto">
-        <header className="flex justify-between items-center mb-12">
+    <div className="min-h-screen bg-[#050505] text-zinc-100 p-8">
+      <div className="max-w-7xl mx-auto">
+        <header className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Agency Command Center</h1>
-            <p className="text-zinc-500 mt-1">Manage all your AI Receptionist clients.</p>
+            <h1 className="text-3xl font-bold tracking-tight text-white">Agency Command Center</h1>
+            <p className="text-zinc-500 mt-1">Manage all your clients, payments, and AI engines.</p>
           </div>
           
           <div className="flex items-center gap-4">
-            <Link 
-              href="/dashboard/client/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-            >
+            <Link href="/dashboard/client/new" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg shadow-blue-900/20">
               + Add New Client
             </Link>
-            <img src={session.user.image || ""} alt="Profile" className="w-10 h-10 rounded-full border border-zinc-200 dark:border-zinc-800" />
             <form action="/api/auth/signout" method="POST">
-              <button type="submit" className="text-sm font-medium hover:underline text-zinc-500">
+              <button type="submit" className="text-sm font-medium hover:text-white text-zinc-500 transition-colors">
                 Sign Out
               </button>
             </form>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {clients.length === 0 && (
-            <div className="col-span-full text-center py-12 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800">
-              <h3 className="text-xl font-medium text-zinc-400">No clients yet.</h3>
-              <p className="text-zinc-500 mt-2">Click "Add New Client" to onboard your first customer!</p>
+        {/* AI Billing Assistant Widget */}
+        <div className="glass-panel rounded-2xl p-6 mb-8 border border-white/5 flex flex-col md:flex-row gap-6 justify-between items-center">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
+              <span className="text-2xl">🤖</span>
             </div>
-          )}
+            <div>
+              <h2 className="text-lg font-bold text-white">Billing AI Assistant</h2>
+              <p className="text-sm text-zinc-400">Monitoring your cash flow in real-time.</p>
+            </div>
+          </div>
+          
+          <div className="flex gap-8">
+            <div className="text-center">
+              <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold mb-1">Monthly Recurring</p>
+              <p className="text-2xl font-bold text-emerald-400">${totalMRR.toLocaleString()}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold mb-1">Overdue Payments</p>
+              <p className={`text-2xl font-bold ${overdueCount > 0 ? 'text-red-500 animate-pulse' : 'text-zinc-300'}`}>{overdueCount}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-zinc-500 uppercase tracking-widest font-bold mb-1">Follow-Ups Due</p>
+              <p className={`text-2xl font-bold ${followUpCount > 0 ? 'text-amber-400' : 'text-zinc-300'}`}>{followUpCount}</p>
+            </div>
+          </div>
+        </div>
 
-          {clients.map((client) => (
-            <Link href={`/dashboard/client/${client.id}`} key={client.id}>
-              <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 hover:border-blue-500 dark:hover:border-blue-500 transition-colors cursor-pointer shadow-sm hover:shadow-md">
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-semibold truncate pr-4">{client.name}</h2>
-                  <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                    {client.industry || "General"}
-                  </span>
-                </div>
-                
-                <div className="space-y-2 text-sm text-zinc-500 dark:text-zinc-400">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                    </svg>
-                    <span>{client.vapiPhoneNumber || "No Phone Assigned"}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    <span className={client.googleRefreshToken ? "text-green-500" : ""}>
-                      {client.googleRefreshToken ? "Calendar Connected" : "Calendar Pending"}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
+        {/* CRM Spreadsheet View */}
+        <div className="glass-panel rounded-2xl overflow-hidden border border-white/5 shadow-2xl">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-white/5 text-zinc-400 border-b border-white/10">
+                <tr>
+                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Client Name</th>
+                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Status</th>
+                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Retainer</th>
+                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Due Day</th>
+                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs">Voice AI</th>
+                  <th className="px-6 py-4 font-medium uppercase tracking-wider text-xs text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {clients.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-8 text-center text-zinc-500">
+                      No clients found. Click "Add New Client" to start building your empire.
+                    </td>
+                  </tr>
+                )}
+                {clients.map((client) => {
+                   const isOverdue = client.status === "ACTIVE" && client.paymentDueDate && today.getDate() > client.paymentDueDate && (!client.lastPaymentDate || client.lastPaymentDate.getMonth() !== today.getMonth());
+                   return (
+                  <tr key={client.id} className="hover:bg-white/5 transition-colors group">
+                    <td className="px-6 py-4 font-semibold text-white">
+                      {client.name}
+                      <div className="text-xs text-zinc-500 font-normal">{client.industry || "General"}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-md border ${
+                        client.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                        client.status === 'PITCHING' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                        client.status === 'CHURNED' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                        'bg-zinc-800 text-zinc-400 border-zinc-700'
+                      }`}>
+                        {client.status || 'LEAD'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-mono text-zinc-300">
+                      ${client.monthlyRetainer?.toLocaleString() || '0'}/mo
+                    </td>
+                    <td className="px-6 py-4">
+                      {client.paymentDueDate ? (
+                        <div className="flex items-center gap-2">
+                          <span className="text-zinc-300 font-mono">Day {client.paymentDueDate}</span>
+                          {isOverdue && <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" title="Overdue!"></span>}
+                        </div>
+                      ) : <span className="text-zinc-600">-</span>}
+                    </td>
+                    <td className="px-6 py-4">
+                      {client.vapiPhoneNumber ? (
+                        <span className="text-emerald-400 font-mono text-xs bg-emerald-400/10 px-2 py-1 rounded">Live</span>
+                      ) : (
+                        <span className="text-zinc-600 text-xs">Offline</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <Link href={`/dashboard/client/${client.id}`} className="text-blue-400 hover:text-blue-300 font-medium text-sm transition-colors opacity-0 group-hover:opacity-100">
+                        Open Command Center &rarr;
+                      </Link>
+                    </td>
+                  </tr>
+                )})}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
