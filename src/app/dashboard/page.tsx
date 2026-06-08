@@ -110,7 +110,7 @@ export default async function AgencyDashboard() {
         </div>
 
         {/* CRM Spreadsheet View */}
-        <CrmSpreadsheet initialClients={clients} todayStr={today.toISOString()} />
+        <CrmSpreadsheet initialClients={JSON.parse(JSON.stringify(clients))} todayStr={today.toISOString()} />
       </div>
     </div>
   );
