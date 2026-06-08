@@ -10,7 +10,8 @@ export const dynamic = "force-dynamic";
 export default async function ClientDetailPage({ params }: { params: { id: string } }) {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user || session.user.email !== "zachfransman8@gmail.com") {
+  const allowedEmails = ["zachfransman8@gmail.com", "fransmanmarketing@gmail.com"];
+  if (!session?.user || !allowedEmails.includes(session.user.email as string)) {
     redirect("/login");
   }
 

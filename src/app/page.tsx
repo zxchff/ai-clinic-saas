@@ -23,12 +23,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ i
           <div className="font-bold text-2xl tracking-tight text-indigo-600 dark:text-indigo-400">
             AI Clinic SaaS
           </div>
-          <div className="flex gap-4">
-            <Link href="/login" className="px-4 py-2 font-medium hover:text-indigo-600 transition-colors">Login</Link>
-            <Link href="/login" className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full font-medium transition-all shadow-sm">
-              Get Started
-            </Link>
-          </div>
+            <div className="flex gap-4">
+              <a href="mailto:fransmanmarketing@gmail.com" className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full font-medium transition-all shadow-sm">
+                Book Consultation
+              </a>
+            </div>
         </header>
 
         {/* Hero Section */}
@@ -53,10 +52,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ i
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/admin" className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-8 py-4 rounded-full font-medium text-lg hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-              View Admin Dashboard
+            <a href="mailto:fransmanmarketing@gmail.com" className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-8 py-4 rounded-full font-medium text-lg hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+              Book a Consultation
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
-            </Link>
+            </a>
             <button className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-white px-8 py-4 rounded-full font-medium text-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all flex items-center justify-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
               Watch Demo
