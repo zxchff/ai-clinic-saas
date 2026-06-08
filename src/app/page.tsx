@@ -24,10 +24,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ i
             AI Clinic SaaS
           </div>
           <div className="flex gap-4">
-            <button className="px-4 py-2 font-medium hover:text-indigo-600 transition-colors">Login</button>
-            <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full font-medium transition-all shadow-sm">
+            <Link href="/login" className="px-4 py-2 font-medium hover:text-indigo-600 transition-colors">Login</Link>
+            <Link href="/login" className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full font-medium transition-all shadow-sm">
               Get Started
-            </button>
+            </Link>
           </div>
         </header>
 
