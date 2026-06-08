@@ -68,8 +68,6 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             <DeployVoiceButton clientId={client.id} />
             <button className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
-              Deploy Chatbot
-            </button>
           </div>
         </header>
 
@@ -78,9 +76,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
           <div className="grid grid-cols-1 gap-8">
             
             {/* 1. Voice AI Engine */}
-            <form action={updateAI} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden relative shadow-lg">
-              <div className="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-              <div className="p-8">
+            <form action={updateAI} className="glass-panel glow-voice rounded-2xl overflow-hidden relative shadow-lg group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-opacity group-hover:bg-violet-600/20"></div>
+              <div className="p-8 relative z-10">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -136,9 +134,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             </form>
 
             {/* 2. Website Chatbot Engine */}
-            <form action={updateAI} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden relative shadow-lg">
-              <div className="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
-              <div className="p-8">
+            <form action={updateAI} className="glass-panel glow-chat rounded-2xl overflow-hidden relative shadow-lg group">
+              <div className="absolute bottom-0 right-0 w-64 h-64 bg-cyan-600/10 rounded-full blur-3xl -mr-20 -mb-20 pointer-events-none transition-opacity group-hover:bg-cyan-600/20"></div>
+              <div className="p-8 relative z-10">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-3">
@@ -188,9 +186,9 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             </form>
 
             {/* 3. Email Automation Engine */}
-            <form action={updateAI} className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden relative shadow-lg">
-              <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
-              <div className="p-8">
+            <form action={updateAI} className="glass-panel glow-email rounded-2xl overflow-hidden relative shadow-lg group">
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-600/10 rounded-full blur-3xl -ml-20 -mb-20 pointer-events-none transition-opacity group-hover:bg-emerald-600/20"></div>
+              <div className="p-8 relative z-10">
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-3">
