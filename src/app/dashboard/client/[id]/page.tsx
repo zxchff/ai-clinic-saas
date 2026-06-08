@@ -6,6 +6,8 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import DeployVoiceButton from "@/components/DeployVoiceButton";
 
+import { deployChatbot, deployEmailBot, undeployEngine } from "@/app/actions/vapi";
+
 export const dynamic = "force-dynamic";
 
 export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -93,14 +95,15 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     </h2>
                     <p className="text-zinc-400 mt-1">24/7 inbound and outbound phone receptionist.</p>
                   </div>
-                  {client.vapiPhoneNumber ? (
-                    <div className="text-right">
-                      <p className="text-xs text-blue-400 uppercase tracking-wider font-bold mb-1">Live Number</p>
-                      <p className="text-2xl font-mono text-white bg-blue-900/20 px-4 py-2 rounded-lg border border-blue-800/50">{client.vapiPhoneNumber}</p>
-                    </div>
-                  ) : (
-                    <DeployVoiceButton clientId={client.id} />
-                  )}
+                  <div className="flex items-center gap-3">
+                    {client.vapiPhoneNumber ? (
+                      <button formAction={async () => { "use server"; await undeployEngine(client.id, "VOICE"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                        Stop Engine
+                      </button>
+                    ) : (
+                      <DeployVoiceButton clientId={client.id} />
+                    )}
+                  </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-zinc-300 mb-2">Voice Receptionist Instructions</label>
@@ -123,14 +126,32 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                       💬 Website Chatbot
-                      <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded bg-zinc-800 text-zinc-500 border border-zinc-700">Not Deployed</span>
+                      {client.chatbotEmbedCode ? (
+                        <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded bg-green-500/10 text-green-400 border border-green-500/20">Active</span>
+                      ) : (
+                        <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded bg-zinc-800 text-zinc-500 border border-zinc-700">Not Deployed</span>
+                      )}
                     </h2>
                     <p className="text-zinc-400 mt-1">Embeddable smart widget for the client's website.</p>
                   </div>
-                  <button type="button" className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
-                    Deploy Chatbot
-                  </button>
+                  <div className="flex items-center gap-3">
+                    {client.chatbotEmbedCode ? (
+                      <button formAction={async () => { "use server"; await undeployEngine(client.id, "CHAT"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                        Stop Engine
+                      </button>
+                    ) : (
+                      <button formAction={async () => { "use server"; await deployChatbot(client.id); }} className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                        Deploy Chatbot
+                      </button>
+                    )}
+                  </div>
                 </div>
+                {client.chatbotEmbedCode && (
+                  <div className="mb-6 p-4 bg-zinc-950 border border-zinc-800 rounded-xl">
+                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Website Embed Code</p>
+                    <code className="text-xs text-purple-400 break-all">{client.chatbotEmbedCode}</code>
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-zinc-300 mb-2">Chatbot Instructions</label>
                   <textarea 
@@ -152,14 +173,32 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   <div>
                     <h2 className="text-2xl font-bold text-white flex items-center gap-3">
                       ✉️ Email Automation
-                      <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded bg-zinc-800 text-zinc-500 border border-zinc-700">Not Deployed</span>
+                      {client.connectedEmail ? (
+                        <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded bg-green-500/10 text-green-400 border border-green-500/20">Active</span>
+                      ) : (
+                        <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded bg-zinc-800 text-zinc-500 border border-zinc-700">Not Deployed</span>
+                      )}
                     </h2>
                     <p className="text-zinc-400 mt-1">Auto-draft replies to inbound patient emails.</p>
                   </div>
-                  <button type="button" className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
-                    Connect Gmail
-                  </button>
+                  <div className="flex items-center gap-3">
+                    {client.connectedEmail ? (
+                      <button formAction={async () => { "use server"; await undeployEngine(client.id, "EMAIL"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                        Stop Engine
+                      </button>
+                    ) : (
+                      <button formAction={async () => { "use server"; await deployEmailBot(client.id); }} className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                        Connect Gmail
+                      </button>
+                    )}
+                  </div>
                 </div>
+                {client.connectedEmail && (
+                  <div className="mb-6 p-4 bg-zinc-950 border border-zinc-800 rounded-xl">
+                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Connected Account</p>
+                    <p className="text-lg font-medium text-emerald-400">{client.connectedEmail}</p>
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-zinc-300 mb-2">Email Writer Instructions</label>
                   <textarea 

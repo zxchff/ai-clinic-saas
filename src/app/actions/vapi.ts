@@ -31,3 +31,46 @@ export async function deployVoiceAI(clientId: string, countryCode: string = "+1"
   
   return { success: true, phoneNumber: fakePhoneNumber };
 }
+
+export async function deployChatbot(clientId: string) {
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  const fakeEmbedCode = `<script src="https://ai-clinic.saas/widget.js" data-client="${clientId}"></script>`;
+
+  await prisma.client.update({
+    where: { id: clientId },
+    data: { chatbotEmbedCode: fakeEmbedCode }
+  });
+
+  revalidatePath(`/dashboard/client/${clientId}`);
+  return { success: true };
+}
+
+export async function deployEmailBot(clientId: string) {
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  await prisma.client.update({
+    where: { id: clientId },
+    data: { connectedEmail: "hello@clinic.com" }
+  });
+
+  revalidatePath(`/dashboard/client/${clientId}`);
+  return { success: true };
+}
+
+export async function undeployEngine(clientId: string, engine: "VOICE" | "CHAT" | "EMAIL") {
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  let data = {};
+  if (engine === "VOICE") data = { vapiPhoneNumber: null };
+  if (engine === "CHAT") data = { chatbotEmbedCode: null };
+  if (engine === "EMAIL") data = { connectedEmail: null };
+
+  await prisma.client.update({
+    where: { id: clientId },
+    data
+  });
+
+  revalidatePath(`/dashboard/client/${clientId}`);
+  return { success: true };
+}
