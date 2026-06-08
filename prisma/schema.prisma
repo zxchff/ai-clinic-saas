@@ -18,8 +18,10 @@ model Client {
   phone     String?  // Optional Twilio phone number
   emailAuth Boolean  @default(false) // Has connected Google Workspace?
   
-  // Google Calendar Integration
+  // Google Integrations
   googleRefreshToken String?
+  sheetsRefreshToken String?
+  googleSheetsId     String?
   vapiPhoneNumber    String?
   countryCode        String   @default("+1")
   voiceId            String   @default("rachel")
