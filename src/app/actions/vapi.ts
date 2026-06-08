@@ -3,7 +3,13 @@
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function deployVoiceAI(clientId: string, countryCode: string = "+1") {
+export async function deployVoiceAI(clientId: string) {
+  // Read the saved country code from the client
+  const client = await prisma.client.findUnique({
+    where: { id: clientId }
+  });
+  const countryCode = client?.countryCode || "+1";
+
   // SIMULATOR: We are pretending to call the Vapi & Twilio APIs here.
   // In a real production environment with a Vapi API key, this would do:
   // 1. POST https://api.vapi.ai/assistant to create the assistant with the client's rulebook

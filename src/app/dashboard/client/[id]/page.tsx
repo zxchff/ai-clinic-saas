@@ -35,6 +35,8 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         phoneInstructions: formData.get("phoneInstructions") as string,
         chatInstructions: formData.get("chatInstructions") as string,
         emailInstructions: formData.get("emailInstructions") as string,
+        countryCode: formData.get("countryCode") as string,
+        voiceId: formData.get("voiceId") as string,
       }
     });
 
@@ -114,6 +116,36 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all font-mono text-sm leading-relaxed"
                     placeholder="Speak professionally. Ask for patient name..."
                   />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">Region (Phone Number)</label>
+                    <select 
+                      name="countryCode"
+                      defaultValue={client.countryCode || "+1"}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all text-sm"
+                    >
+                      <option value="+1">US/CA (+1)</option>
+                      <option value="+44">UK (+44)</option>
+                      <option value="+61">AU (+61)</option>
+                      <option value="+27">ZA (+27)</option>
+                      <option value="+91">IN (+91)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-400 mb-2">AI Voice Persona</label>
+                    <select 
+                      name="voiceId"
+                      defaultValue={client.voiceId || "rachel"}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all text-sm"
+                    >
+                      <option value="rachel">Rachel (Friendly Female)</option>
+                      <option value="drew">Drew (Professional Male)</option>
+                      <option value="mimi">Mimi (Energetic Female)</option>
+                      <option value="clyde">Clyde (Deep Male)</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>

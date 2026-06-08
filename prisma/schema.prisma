@@ -21,6 +21,8 @@ model Client {
   // Google Calendar Integration
   googleRefreshToken String?
   vapiPhoneNumber    String?
+  countryCode        String   @default("+1")
+  voiceId            String   @default("rachel")
   chatbotEmbedCode   String?
   connectedEmail     String?
   calendarId         String?
