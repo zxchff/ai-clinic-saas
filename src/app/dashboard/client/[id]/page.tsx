@@ -8,7 +8,8 @@ import DeployVoiceButton from "@/components/DeployVoiceButton";
 
 export const dynamic = "force-dynamic";
 
-export default async function ClientDetailPage({ params }: { params: { id: string } }) {
+export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await getServerSession(authOptions);
 
   const allowedEmails = ["zachfransman8@gmail.com", "fransmanmarketing@gmail.com"];
@@ -17,7 +18,7 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
   }
 
   const client = await prisma.client.findUnique({
-    where: { id: params.id }
+    where: { id }
   });
 
   if (!client) redirect("/dashboard");
@@ -27,14 +28,14 @@ export default async function ClientDetailPage({ params }: { params: { id: strin
     "use server";
     
     await prisma.client.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         rulebook: formData.get("rulebook") as string,
         chatInstructions: formData.get("chatInstructions") as string,
       }
     });
 
-    revalidatePath(`/dashboard/client/${params.id}`);
+    revalidatePath(`/dashboard/client/${id}`);
   }
 
   return (
