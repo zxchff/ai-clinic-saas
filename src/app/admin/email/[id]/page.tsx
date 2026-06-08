@@ -1,6 +1,8 @@
 import prisma from "@/lib/prisma";
 import EmailForm from "@/components/EmailForm";
 
+export const dynamic = "force-dynamic";
+
 export default async function EmailSimulator({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const client = await prisma.client.findUnique({
