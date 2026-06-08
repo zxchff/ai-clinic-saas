@@ -2,6 +2,8 @@ import ChatWidget from "@/components/ChatWidget";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 
+export const dynamic = "force-dynamic";
+
 export default async function Home({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
   const params = await searchParams;
   let latestClient = null;
