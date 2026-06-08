@@ -149,7 +149,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                         <span className="px-2 py-0.5 text-xs font-bold uppercase tracking-wide rounded bg-zinc-800 text-zinc-500 border border-zinc-700">Not Deployed</span>
                       )}
                     </h2>
-                    <p className="text-zinc-400 mt-1">Embeddable smart widget for the client's website.</p>
+                    <p className="text-zinc-400 mt-1">Embeddable smart widget for the client&apos;s website.</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <button type="submit" className="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-lg font-bold transition-colors text-sm">
