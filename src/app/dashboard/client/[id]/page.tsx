@@ -6,7 +6,6 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import DeployVoiceButton from "@/components/DeployVoiceButton";
 import VoiceSelector from "@/components/VoiceSelector";
-import PayPalSubscribeButton from "@/components/PayPalSubscribeButton";
 
 import { deployChatbot, deployEmailBot, undeployEngine } from "@/app/actions/vapi";
 
@@ -109,9 +108,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                       </a>
                     )}
 
-                    {client.voiceBillingStatus === "UNPAID" ? (
-                      <PayPalSubscribeButton clientId={client.id} engineType="VOICE" price="199" title="Voice AI" />
-                    ) : client.vapiPhoneNumber ? (
+                    {client.vapiPhoneNumber ? (
                       <button formAction={async () => { "use server"; await undeployEngine(client.id, "VOICE"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
                         Stop Engine
                       </button>
@@ -155,9 +152,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     <button type="submit" className="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-lg font-bold transition-colors text-sm">
                       Save Settings
                     </button>
-                    {client.chatBillingStatus === "UNPAID" ? (
-                      <PayPalSubscribeButton clientId={client.id} engineType="CHAT" price="99" title="Website Chatbot" />
-                    ) : client.chatbotEmbedCode ? (
+                    {client.chatbotEmbedCode ? (
                       <button formAction={async () => { "use server"; await undeployEngine(client.id, "CHAT"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
                         Stop Engine
                       </button>
@@ -207,9 +202,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     <button type="submit" className="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-lg font-bold transition-colors text-sm">
                       Save Settings
                     </button>
-                    {client.emailBillingStatus === "UNPAID" ? (
-                      <PayPalSubscribeButton clientId={client.id} engineType="EMAIL" price="49" title="Email Automation" />
-                    ) : client.connectedEmail ? (
+                    {client.connectedEmail ? (
                       <button formAction={async () => { "use server"; await undeployEngine(client.id, "EMAIL"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
                         Stop Engine
                       </button>

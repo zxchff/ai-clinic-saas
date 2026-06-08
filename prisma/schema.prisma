@@ -30,9 +30,6 @@ model Client {
   calendarId         String?
   
   // Billing & Subscription Tracking
-  voiceBillingStatus   String    @default("UNPAID") // UNPAID, ACTIVE
-  chatBillingStatus    String    @default("UNPAID") // UNPAID, ACTIVE
-  emailBillingStatus   String    @default("UNPAID") // UNPAID, ACTIVE
   lastPaidDate         DateTime?
   paypalSubscriptionId String?   @unique
   
