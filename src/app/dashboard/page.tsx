@@ -15,7 +15,7 @@ export default async function AgencyDashboard() {
 
   // SECURITY: Lock down to Admin only!
   const allowedEmails = ["zachfransman8@gmail.com", "fransmanmarketing@gmail.com"];
-  if (!allowedEmails.includes(session.user.email)) {
+  if (!allowedEmails.includes(session.user.email as string)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-950 text-white">
         <div className="text-center">
