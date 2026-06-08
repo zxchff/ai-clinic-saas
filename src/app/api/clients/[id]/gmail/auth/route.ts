@@ -12,7 +12,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   }
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const redirectUri = `${appUrl}/api/clients/${clientId}/gmail/callback`;
+  const redirectUri = `${appUrl}/api/oauth/gmail/callback`;
 
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -30,6 +30,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     scope: scopes,
     include_granted_scopes: true,
     prompt: "consent", // Force consent to guarantee we get a refresh token
+    state: clientId, // Secretly pass the clientId so the callback route knows who this is for
   });
 
   return NextResponse.redirect(authorizationUrl);

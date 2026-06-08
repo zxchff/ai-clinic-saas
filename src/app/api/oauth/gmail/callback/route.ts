@@ -4,8 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import prisma from "@/lib/prisma";
 
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id: clientId } = await params;
+export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
 
   if (!session?.user) {
@@ -14,13 +13,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
+  const state = searchParams.get("state"); // This contains the clientId!
 
-  if (!code) {
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard/client/${clientId}?error=NoAuthCode`);
+  if (!code || !state) {
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}/dashboard?error=MissingCodeOrState`);
   }
 
+  const clientId = state; // We injected the clientId into the state parameter
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const redirectUri = `${appUrl}/api/clients/${clientId}/gmail/callback`;
+  const redirectUri = `${appUrl}/api/oauth/gmail/callback`;
 
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
@@ -42,7 +43,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     }
 
     // Save to the database
-    // Note: Google only sends refresh_token on the first authorization (or when prompt="consent" is used)
     await prisma.client.update({
       where: { id: clientId },
       data: {
