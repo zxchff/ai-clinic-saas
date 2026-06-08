@@ -28,11 +28,11 @@ model Client {
   calendarId         String?
   
   // Billing & Subscription Tracking
-  billingStatus      String    @default("TRIAL") // TRIAL, ACTIVE, PAST_DUE
-  monthlyPrice       Float     @default(99.00)
-  lastPaidDate       DateTime?
-  nextBillingDate    DateTime?
-  paypalSubscriptionId String? @unique
+  voiceBillingStatus   String    @default("UNPAID") // UNPAID, ACTIVE
+  chatBillingStatus    String    @default("UNPAID") // UNPAID, ACTIVE
+  emailBillingStatus   String    @default("UNPAID") // UNPAID, ACTIVE
+  lastPaidDate         DateTime?
+  paypalSubscriptionId String?   @unique
   
   // The user who owns this clinic
   userId             String?

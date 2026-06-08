@@ -11,30 +11,33 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { subscriptionId } = await request.json();
+    const { orderId, clientId, engineType } = await request.json();
 
-    // Find the user's client profile
+    // Find the client to make sure they own it
     const client = await prisma.client.findFirst({
-      // @ts-ignore
-      where: { userId: session.user.id },
+      where: { 
+        id: clientId,
+        userId: session.user.id 
+      },
     });
 
     if (!client) {
-      return NextResponse.json({ error: "Client not found" }, { status: 404 });
+      return NextResponse.json({ error: "Client not found or unauthorized" }, { status: 404 });
     }
 
-    // In a production environment, you MUST use your PAYPAL_SECRET here to make a 
-    // server-to-server API call to PayPal to verify this subscriptionId is actually ACTIVE 
-    // and belongs to this user. For this prototype, we trust the client-side SDK.
+    // Determine which field to update
+    const updateData: any = {
+      lastPaidDate: new Date()
+    };
+
+    if (engineType === "VOICE") updateData.voiceBillingStatus = "ACTIVE";
+    if (engineType === "CHAT") updateData.chatBillingStatus = "ACTIVE";
+    if (engineType === "EMAIL") updateData.emailBillingStatus = "ACTIVE";
 
     // Update the database to unlock the account!
     await prisma.client.update({
       where: { id: client.id },
-      data: {
-        billingStatus: "ACTIVE",
-        paypalSubscriptionId: subscriptionId,
-        lastPaidDate: new Date(),
-      },
+      data: updateData,
     });
 
     return NextResponse.json({ success: true });
