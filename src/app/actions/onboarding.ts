@@ -14,13 +14,12 @@ export async function submitOnboarding(businessName: string, industry: string) {
   }
 
   // Find the user's client profile
-  const user = await prisma.user.findUnique({
+  const client = await prisma.client.findFirst({
     // @ts-ignore
-    where: { id: session.user.id },
-    include: { client: true }
+    where: { userId: session.user.id },
   });
 
-  if (!user || !user.clientId) {
+  if (!client) {
     throw new Error("Client profile not found. Please log out and log back in.");
   }
 
@@ -40,7 +39,7 @@ export async function submitOnboarding(businessName: string, industry: string) {
 
   // Update the client profile
   await prisma.client.update({
-    where: { id: user.clientId },
+    where: { id: client.id },
     data: {
       name: businessName,
       industry: industry,

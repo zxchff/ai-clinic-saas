@@ -14,12 +14,12 @@ export async function POST(request: Request) {
     const { subscriptionId } = await request.json();
 
     // Find the user's client profile
-    const user = await prisma.user.findUnique({
+    const client = await prisma.client.findFirst({
       // @ts-ignore
-      where: { id: session.user.id },
+      where: { userId: session.user.id },
     });
 
-    if (!user || !user.clientId) {
+    if (!client) {
       return NextResponse.json({ error: "Client not found" }, { status: 404 });
     }
 
@@ -29,7 +29,7 @@ export async function POST(request: Request) {
 
     // Update the database to unlock the account!
     await prisma.client.update({
-      where: { id: user.clientId },
+      where: { id: client.id },
       data: {
         billingStatus: "ACTIVE",
         paypalSubscriptionId: subscriptionId,
