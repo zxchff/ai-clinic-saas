@@ -12,8 +12,7 @@ export default function Paywall({ clientId }: { clientId: string }) {
   const paypalOptions = {
     clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test",
     components: "buttons",
-    intent: "subscription",
-    vault: true,
+    intent: "capture",
   };
 
   return (
@@ -27,7 +26,7 @@ export default function Paywall({ clientId }: { clientId: string }) {
 
         <h2 className="text-2xl font-black mb-2">Unlock Your Dashboard</h2>
         <p className="text-zinc-500 mb-8">
-          Subscribe for $99/month to access your AI Receptionist settings, rulebooks, and analytics.
+          Pay $99 to access your AI Receptionist settings, rulebooks, and analytics.
         </p>
 
         {error && (
@@ -39,20 +38,32 @@ export default function Paywall({ clientId }: { clientId: string }) {
         <PayPalScriptProvider options={paypalOptions}>
           <div className="min-h-[150px]">
             <PayPalButtons
-              createSubscription={(data, actions) => {
-                return actions.subscription.create({
-                  plan_id: process.env.NEXT_PUBLIC_PAYPAL_PLAN_ID || "P-1234567890",
-                  custom_id: clientId, // Attach the user's DB ID to the subscription!
+              createOrder={(data, actions) => {
+                return actions.order.create({
+                  intent: "CAPTURE",
+                  purchase_units: [
+                    {
+                      amount: {
+                        currency_code: "USD",
+                        value: "99.00",
+                      },
+                      custom_id: clientId,
+                    },
+                  ],
                 });
               }}
               onApprove={async (data, actions) => {
                 setLoading(true);
-                // Call our server to verify the subscription
+                // Capture the funds
+                if (!actions.order) return;
+                const details = await actions.order.capture();
+                
+                // Call our server to verify the payment
                 try {
                   const res = await fetch("/api/paypal/verify", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ subscriptionId: data.subscriptionID }),
+                    body: JSON.stringify({ subscriptionId: details.id }), // Using order ID as the receipt
                   });
                   if (res.ok) {
                     router.refresh();
