@@ -23,7 +23,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ i
           <div className="font-bold text-2xl tracking-tight text-indigo-600 dark:text-indigo-400">
             AI Clinic SaaS
           </div>
-            <div className="flex gap-4">
+            <div className="flex gap-4 items-center">
+              <Link href="/dashboard" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300 transition-colors mr-4">
+                Admin Login
+              </Link>
               <a href="mailto:fransmanmarketing@gmail.com" className="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full font-medium transition-all shadow-sm">
                 Book Consultation
               </a>
