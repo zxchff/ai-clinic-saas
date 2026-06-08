@@ -26,6 +26,7 @@ export default async function DashboardPage() {
       data: {
         name: `${session.user.name}'s Business`,
         rulebook: "You are a helpful AI receptionist.",
+        // @ts-ignore
         userId: session.user.id,
       },
     });
