@@ -8,7 +8,7 @@ export default function DeployVoiceButton({ clientId }: { clientId: string }) {
 
   return (
     <button 
-      onClick={() => startTransition(() => deployVoiceAI(clientId))}
+      onClick={() => startTransition(async () => { await deployVoiceAI(clientId); })}
       disabled={isPending}
       className="bg-zinc-800 hover:bg-zinc-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
     >
