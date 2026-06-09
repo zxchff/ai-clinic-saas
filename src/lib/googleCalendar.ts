@@ -100,7 +100,7 @@ export async function bookAppointment(clientId: string, patientName: string, pat
     // 2. BOOK IT
     const event = {
       summary: `Patient Booking: ${patientName}`,
-      description: `Phone: ${patientPhone}\nBooked via AI Clinic SaaS.`,
+      description: `Phone: ${patientPhone || "Not provided"}\nBooked via AI Clinic SaaS.`,
       start: { dateTime: startDateTime.toISOString(), timeZone: "UTC" },
       end: { dateTime: endDateTime.toISOString(), timeZone: "UTC" },
     };
