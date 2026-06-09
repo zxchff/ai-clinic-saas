@@ -27,8 +27,8 @@
         </div>
       </div>
       <div style="padding: 12px; background-color: white; border-top: 1px solid #e5e7eb; display: flex; gap: 8px;">
-        <input type="text" id="ai-clinic-chat-input" placeholder="Type a message..." style="flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 20px; outline: none; font-size: 14px; color: #000; background-color: #fff; pointer-events: auto; cursor: text;">
-        <button id="ai-clinic-send-btn" style="background-color: #3b82f6; color: white; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; pointer-events: auto;">
+        <input type="text" id="ai-clinic-chat-input" placeholder="Type a message..." style="flex: 1; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 20px; outline: none !important; font-size: 14px; color: #000 !important; background-color: #fff !important; pointer-events: all !important; cursor: text !important; user-select: auto !important; z-index: 9999999 !important;">
+        <button id="ai-clinic-send-btn" style="background-color: #3b82f6; color: white; border: none; border-radius: 50%; width: 36px; height: 36px; cursor: pointer; display: flex; align-items: center; justify-content: center; pointer-events: all !important; z-index: 9999999 !important;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
         </button>
       </div>
@@ -46,6 +46,9 @@
 
   btn.addEventListener("click", () => {
     win.style.display = win.style.display === "none" ? "flex" : "none";
+    if (win.style.display === "flex") {
+      setTimeout(() => input.focus(), 100);
+    }
   });
 
   closeBtn.addEventListener("click", () => {
