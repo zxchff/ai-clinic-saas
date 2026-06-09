@@ -66,10 +66,33 @@ export default function VoiceSelector({
           onChange={handleVoiceChange}
           className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-2.5 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all text-sm"
         >
-          <option value="rachel">Rachel (Friendly Female)</option>
-          <option value="drew">Drew (Professional Male)</option>
-          <option value="mimi">Mimi (Energetic Female)</option>
-          <option value="clyde">Clyde (Deep Male)</option>
+          <optgroup label="OpenAI Voices (Fastest)">
+            <option value="alloy">Alloy (Neutral)</option>
+            <option value="echo">Echo (Male)</option>
+            <option value="fable">Fable (British Male)</option>
+            <option value="onyx">Onyx (Deep Male)</option>
+            <option value="nova">Nova (Energetic Female)</option>
+            <option value="shimmer">Shimmer (Soft Female)</option>
+          </optgroup>
+          <optgroup label="ElevenLabs Voices (Most Human)">
+            <option value="rachel">Rachel (Friendly Female)</option>
+            <option value="drew">Drew (Professional Male)</option>
+            <option value="mimi">Mimi (Childish Female)</option>
+            <option value="clyde">Clyde (War Veteran Male)</option>
+            <option value="domi">Domi (Strong Female)</option>
+            <option value="bella">Bella (Soft Female)</option>
+            <option value="antoni">Antoni (Well-rounded Male)</option>
+            <option value="thomas">Thomas (Calm Male)</option>
+            <option value="charlie">Charlie (Natural Male)</option>
+            <option value="emily">Emily (Calm Female)</option>
+            <option value="elli">Elli (Youthful Female)</option>
+            <option value="callum">Callum (Deep British Male)</option>
+            <option value="patrick">Patrick (Shouty Male)</option>
+            <option value="harry">Harry (Anxious Male)</option>
+            <option value="liam">Liam (Young Male)</option>
+            <option value="dorothy">Dorothy (British Female)</option>
+            <option value="josh">Josh (American Male)</option>
+          </optgroup>
         </select>
       </div>
     </div>

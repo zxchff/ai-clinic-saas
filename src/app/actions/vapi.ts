@@ -15,6 +15,9 @@ export async function deployVoiceAI(clientId: string) {
     return { error: "VAPI_PRIVATE_KEY is missing from environment variables." };
   }
 
+  const voiceId = client.voiceId || "rachel";
+  const isOpenAI = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"].includes(voiceId);
+
   // 1. Create the Assistant on Vapi
   const assistantResponse = await fetch("https://api.vapi.ai/assistant", {
     method: "POST",
@@ -30,8 +33,8 @@ export async function deployVoiceAI(clientId: string) {
         messages: [{ role: "system", content: client.phoneInstructions || client.rulebook || "You are a helpful receptionist." }]
       },
       voice: {
-        provider: "11labs",
-        voiceId: client.voiceId || "rachel"
+        provider: isOpenAI ? "openai" : "11labs",
+        voiceId: voiceId
       }
     })
   });
