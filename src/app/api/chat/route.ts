@@ -47,9 +47,15 @@ export async function POST(req: Request) {
       history.shift();
     }
 
-    const chatSession = ai.chats.create({
+    const lastUserMessage = messages[messages.length - 1].content;
+    const contents = [
+      ...history,
+      { role: 'user', parts: [{ text: lastUserMessage }] }
+    ];
+
+    let response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
-      history: history,
+      contents: contents,
       config: {
         systemInstruction: systemPrompt,
         tools: [
@@ -102,9 +108,6 @@ export async function POST(req: Request) {
       }
     });
 
-    const lastUserMessage = messages[messages.length - 1].content;
-    let response = await chatSession.sendMessage({ message: lastUserMessage });
-
     // 3. Check if Gemini decided to call our Calendar Tools!
     if (response.functionCalls && response.functionCalls.length > 0) {
       const call = response.functionCalls[0];
@@ -114,8 +117,19 @@ export async function POST(req: Request) {
         const { checkAvailability } = await import('@/lib/googleCalendar');
         const result = await checkAvailability(clientId, args.date);
         
-        response = await chatSession.sendMessage({
-          message: [{ functionResponse: { name: "check_availability", response: result } }] as any
+        const nextContents = [
+          ...contents,
+          { role: 'model', parts: [{ functionCall: call }] },
+          { role: 'user', parts: [{ functionResponse: { name: "check_availability", response: result } }] }
+        ];
+
+        response = await ai.models.generateContent({
+           model: 'gemini-2.5-flash',
+           contents: nextContents as any,
+           config: {
+              systemInstruction: systemPrompt,
+              // Intentionally stripping tools for the final turn to prevent loops
+           }
         });
       }
       
