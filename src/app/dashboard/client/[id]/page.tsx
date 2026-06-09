@@ -40,6 +40,8 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
     if (formData.has("chatInstructions")) dataToUpdate.chatInstructions = formData.get("chatInstructions") as string;
     if (formData.has("emailInstructions")) dataToUpdate.emailInstructions = formData.get("emailInstructions") as string;
     if (formData.has("schedulingRules")) dataToUpdate.schedulingRules = formData.get("schedulingRules") as string;
+    if (formData.has("activeTimeStart")) dataToUpdate.activeTimeStart = formData.get("activeTimeStart") as string;
+    if (formData.has("activeTimeEnd")) dataToUpdate.activeTimeEnd = formData.get("activeTimeEnd") as string;
     if (formData.has("countryCode")) dataToUpdate.countryCode = formData.get("countryCode") as string;
     if (formData.has("voiceId")) dataToUpdate.voiceId = formData.get("voiceId") as string;
 
@@ -157,15 +159,36 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   </div>
                   <div className="flex items-center gap-3 flex-wrap">
                     <SaveButton />
+                    {client.googleRefreshToken ? (
+                      <span className="bg-green-950/50 text-green-400 border border-green-900/50 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Calendar Active
+                      </span>
+                    ) : (
+                      <a href={`/api/auth/google?clientId=${client.id}`} className="bg-blue-900/40 hover:bg-blue-800/60 text-blue-400 border border-blue-800 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                        Connect Calendar
+                      </a>
+                    )}
 
                     {client.googleSheetsId ? (
                       <span className="bg-green-950/50 text-green-400 border border-green-900/50 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                        Lead Tracker Active
+                        Sheets Active
                       </span>
                     ) : (
                       <a href={`/api/clients/${client.id}/sheets/auth`} className="bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-400 border border-emerald-800 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
                         Connect Google Sheets
+                      </a>
+                    )}
+
+                    {client.googleRefreshToken ? (
+                      <span className="bg-green-950/50 text-green-400 border border-green-900/50 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Calendar Active
+                      </span>
+                    ) : (
+                      <a href={`/api/auth/google?clientId=${client.id}`} className="bg-blue-900/40 hover:bg-blue-800/60 text-blue-400 border border-blue-800 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                        Connect Google Calendar
                       </a>
                     )}
 
@@ -224,6 +247,27 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                       placeholder="E.g. No appointments on Fridays. Lunch break from 12-1pm."
                     />
                   </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-300 mb-2">Open Time</label>
+                      <input 
+                        type="time" 
+                        name="activeTimeStart" 
+                        defaultValue={client.activeTimeStart || "09:00"} 
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-zinc-300 mb-2">Close Time</label>
+                      <input 
+                        type="time" 
+                        name="activeTimeEnd" 
+                        defaultValue={client.activeTimeEnd || "17:00"} 
+                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-8">
@@ -259,6 +303,16 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   </div>
                   <div className="flex items-center gap-3">
                     <SaveButton />
+                    {client.googleRefreshToken ? (
+                      <span className="bg-green-950/50 text-green-400 border border-green-900/50 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Calendar Active
+                      </span>
+                    ) : (
+                      <a href={`/api/auth/google?clientId=${client.id}`} className="bg-blue-900/40 hover:bg-blue-800/60 text-blue-400 border border-blue-800 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                        Connect Calendar
+                      </a>
+                    )}
                     {client.chatbotEmbedCode ? (
                       <button formAction={async () => { "use server"; await undeployEngine(client.id, "CHAT"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
                         Stop Engine

@@ -16,6 +16,8 @@ model Client {
   phoneInstructions String   @default("Speak slowly. Ask clarifying questions one at a time. Never use emojis.")
   emailInstructions String   @default("Write professionally. Use a formal greeting and signature.")
   schedulingRules   String?  @db.Text
+  activeTimeStart   String?  @default("09:00")
+  activeTimeEnd     String?  @default("17:00")
   phone     String?  // Optional Twilio phone number
   emailAuth Boolean  @default(false) // Has connected Google Workspace?
   
