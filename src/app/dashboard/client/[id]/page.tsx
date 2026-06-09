@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import DeployVoiceButton from "@/components/DeployVoiceButton";
 import VoiceSelector from "@/components/VoiceSelector";
 import SaveButton from "@/components/SaveButton";
+import WebCallButton from "@/components/WebCallButton";
 
 import { deployChatbot, deployEmailBot, undeployEngine } from "@/app/actions/vapi";
 import { updateCRMFields, deleteClient, globalKillSwitch } from "@/app/actions/crm";
@@ -163,9 +164,19 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     )}
 
                     {client.vapiPhoneNumber ? (
-                      <button formAction={async () => { "use server"; await undeployEngine(client.id, "VOICE"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
-                        Stop Engine
-                      </button>
+                      <>
+                        <span className="bg-green-950/50 text-green-400 border border-green-900/50 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                          </span>
+                          {client.vapiPhoneNumber}
+                        </span>
+                        <WebCallButton client={client} />
+                        <button formAction={async () => { "use server"; await undeployEngine(client.id, "VOICE"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                          Stop Engine
+                        </button>
+                      </>
                     ) : (
                       <DeployVoiceButton clientId={client.id} />
                     )}
