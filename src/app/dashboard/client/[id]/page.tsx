@@ -10,6 +10,7 @@ import SaveButton from "@/components/SaveButton";
 import WebCallButton from "@/components/WebCallButton";
 import ImportedNumberSelector from "@/components/ImportedNumberSelector";
 import ClientPortalButton from "@/components/ClientPortalButton";
+import CommandCopilot from "@/components/CommandCopilot";
 
 import { deployChatbot, deployEmailBot, undeployEngine } from "@/app/actions/vapi";
 import { updateCRMFields, deleteClient, globalKillSwitch } from "@/app/actions/crm";
@@ -425,5 +426,6 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         </div>
       </div>
     </div>
+  </div>
   );
 }
