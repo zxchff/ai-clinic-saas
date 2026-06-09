@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { GoogleGenAI, Type } from '@google/genai';
 import prisma from '@/lib/prisma';
-import { bookAppointment } from '@/lib/googleCalendar';
+import { bookAppointment, checkAvailability } from '@/lib/googleCalendar';
 
 const ai = new GoogleGenAI({});
 
@@ -31,17 +31,29 @@ export async function POST(req: Request) {
           {
             functionDeclarations: [
               {
+                name: "check_availability",
+                description: "Queries the Google Calendar to find all busy/occupied time slots for a specific date.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: {
+                    date: { type: Type.STRING, description: "The date to check in YYYY-MM-DD format." }
+                  },
+                  required: ["date"]
+                }
+              },
+              {
                 name: "book_appointment",
                 description: "Books an appointment on the clinic's Google Calendar. ONLY call this when the user has provided their name, phone number, and requested a specific date and time.",
                 parameters: {
                   type: Type.OBJECT,
                   properties: {
                     date: { type: Type.STRING, description: "The date of the appointment in YYYY-MM-DD format." },
-                    time: { type: Type.STRING, description: "The time of the appointment in HH:MM format (24-hour)." },
+                    time: { type: Type.STRING, description: "The time of the appointment in HH:MM format (24-hour UTC)." },
+                    durationMinutes: { type: Type.NUMBER, description: "The duration of the appointment in minutes based on what the patient asked for." },
                     patientName: { type: Type.STRING, description: "The name of the patient." },
                     patientPhone: { type: Type.STRING, description: "The phone number of the patient. If not provided in the email, use 'Unknown'." },
                   },
-                  required: ["date", "time", "patientName", "patientPhone"],
+                  required: ["date", "time", "durationMinutes", "patientName", "patientPhone"],
                 },
               },
             ],
@@ -53,22 +65,25 @@ export async function POST(req: Request) {
     const userMessage = `From: ${fromName} <${fromEmail}>\nSubject: ${subject}\n\nBody: ${body}`;
     let response = await chatSession.sendMessage({ message: userMessage });
 
-    // Check if Gemini called the Calendar Tool
+    // Check if Gemini called the Calendar Tools
     if (response.functionCalls && response.functionCalls.length > 0) {
       const call = response.functionCalls[0];
-      if (call.name === "book_appointment") {
+      
+      if (call.name === "check_availability") {
         const args = call.args as any;
-        const result = await bookAppointment(clientId, args.patientName, args.patientPhone, args.date, args.time);
+        const result = await checkAvailability(clientId, args.date);
         
         response = await chatSession.sendMessage({
-          message: [
-            {
-              functionResponse: {
-                name: "book_appointment",
-                response: result,
-              }
-            }
-          ] as any
+          message: [{ functionResponse: { name: "check_availability", response: result } }] as any
+        });
+      }
+      
+      else if (call.name === "book_appointment") {
+        const args = call.args as any;
+        const result = await bookAppointment(clientId, args.patientName, args.patientPhone, args.date, args.time, args.durationMinutes);
+        
+        response = await chatSession.sendMessage({
+          message: [{ functionResponse: { name: "book_appointment", response: result } }] as any
         });
       }
     }

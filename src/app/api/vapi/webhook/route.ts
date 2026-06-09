@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { bookAppointment } from "@/lib/googleCalendar";
+import { bookAppointment, checkAvailability } from "@/lib/googleCalendar";
 import prisma from "@/lib/prisma";
 import { google } from "googleapis";
 
@@ -19,7 +19,17 @@ export async function POST(req: Request) {
       const results = [];
       for (const item of body.message.toolWithToolCallList) {
         const toolCall = item.toolCall;
-        if (toolCall.function.name === "book_appointment") {
+        if (toolCall.function.name === "check_availability") {
+          const args = toolCall.function.arguments;
+          const parsedArgs = typeof args === 'string' ? JSON.parse(args) : args;
+          try {
+            const calendarResult = await checkAvailability(clientId, parsedArgs.date);
+            results.push({ toolCallId: toolCall.id, result: JSON.stringify(calendarResult) });
+          } catch (error: any) {
+            results.push({ toolCallId: toolCall.id, result: `Error checking availability: ${error.message}` });
+          }
+        }
+        else if (toolCall.function.name === "book_appointment") {
           const args = toolCall.function.arguments;
           const parsedArgs = typeof args === 'string' ? JSON.parse(args) : args;
           try {
@@ -28,12 +38,13 @@ export async function POST(req: Request) {
               parsedArgs.patientName,
               parsedArgs.patientPhone,
               parsedArgs.date,
-              parsedArgs.time
+              parsedArgs.time,
+              parsedArgs.durationMinutes || 60
             );
             if (calendarResult.success) {
-              results.push({ toolCallId: toolCall.id, result: `Successfully booked appointment.` });
+              results.push({ toolCallId: toolCall.id, result: `Successfully booked appointment: ${calendarResult.message}` });
             } else {
-              results.push({ toolCallId: toolCall.id, result: `Failed to book appointment.` });
+              results.push({ toolCallId: toolCall.id, result: `Failed to book appointment: ${calendarResult.message || calendarResult.error}` });
             }
           } catch (error: any) {
             results.push({ toolCallId: toolCall.id, result: `Error booking calendar: ${error.message}` });

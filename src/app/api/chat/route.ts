@@ -46,6 +46,17 @@ export async function POST(req: Request) {
           {
             functionDeclarations: [
               {
+                name: "check_availability",
+                description: "Queries the Google Calendar to find all busy/occupied time slots for a specific date.",
+                parameters: {
+                  type: Type.OBJECT,
+                  properties: {
+                    date: { type: Type.STRING, description: "The date to check in YYYY-MM-DD format." }
+                  },
+                  required: ["date"]
+                }
+              },
+              {
                 name: "book_appointment",
                 description: "Books an appointment on the clinic's Google Calendar. ONLY call this when the user has provided their name, phone number, and requested a specific date and time.",
                 parameters: {
@@ -57,7 +68,11 @@ export async function POST(req: Request) {
                     },
                     time: {
                       type: Type.STRING,
-                      description: "The time of the appointment in HH:MM format (24-hour).",
+                      description: "The time of the appointment in HH:MM format (24-hour UTC).",
+                    },
+                    durationMinutes: {
+                      type: Type.NUMBER,
+                      description: "The duration of the appointment in minutes based on what the patient asked for (e.g. 30, 60, 120).",
                     },
                     patientName: {
                       type: Type.STRING,
@@ -68,7 +83,7 @@ export async function POST(req: Request) {
                       description: "The phone number of the patient.",
                     },
                   },
-                  required: ["date", "time", "patientName", "patientPhone"],
+                  required: ["date", "time", "durationMinutes", "patientName", "patientPhone"],
                 },
               },
             ],
@@ -80,26 +95,30 @@ export async function POST(req: Request) {
     const lastUserMessage = messages[messages.length - 1].content;
     let response = await chatSession.sendMessage({ message: lastUserMessage });
 
-    // 3. Check if Gemini decided to call our Calendar Tool!
+    // 3. Check if Gemini decided to call our Calendar Tools!
     if (response.functionCalls && response.functionCalls.length > 0) {
       const call = response.functionCalls[0];
-      if (call.name === "book_appointment" && clientId) {
+      
+      if (call.name === "check_availability" && clientId) {
+        const args = call.args as any;
+        const { checkAvailability } = await import('@/lib/googleCalendar');
+        const result = await checkAvailability(clientId, args.date);
+        
+        response = await chatSession.sendMessage({
+          message: [{ functionResponse: { name: "check_availability", response: result } }] as any
+        });
+      }
+      
+      else if (call.name === "book_appointment" && clientId) {
         const args = call.args as any;
         const { bookAppointment } = await import('@/lib/googleCalendar');
         
         // Push the event to Google Calendar
-        const result = await bookAppointment(clientId, args.patientName, args.patientPhone, args.date, args.time);
+        const result = await bookAppointment(clientId, args.patientName, args.patientPhone, args.date, args.time, args.durationMinutes);
         
         // Tell Gemini the result so it can reply to the user
         response = await chatSession.sendMessage({
-          message: [
-            {
-              functionResponse: {
-                name: "book_appointment",
-                response: result,
-              }
-            }
-          ] as any
+          message: [{ functionResponse: { name: "book_appointment", response: result } }] as any
         });
       }
     }

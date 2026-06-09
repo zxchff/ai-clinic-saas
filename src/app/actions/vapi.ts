@@ -30,7 +30,53 @@ export async function deployVoiceAI(clientId: string) {
       model: {
         provider: "openai",
         model: "gpt-4o",
-        messages: [{ role: "system", content: `${client.phoneInstructions || client.rulebook || "You are a helpful receptionist."}\n\nCRITICAL SCHEDULING RULES:\n${client.schedulingRules || "You can book appointments at any valid business time."}\nYou MUST STRICTLY enforce these scheduling rules when using the book_appointment tool.` }]
+        messages: [{ role: "system", content: `${client.phoneInstructions || client.rulebook || "You are a helpful receptionist."}\n\nCRITICAL SCHEDULING RULES:\n${client.schedulingRules || "You can book appointments at any valid business time."}\nYou MUST STRICTLY enforce these scheduling rules when using the book_appointment tool.` }],
+        tools: [
+          {
+            type: "function",
+            messages: [
+              {
+                type: "request-start",
+                content: "Let me check the calendar for you real quick."
+              }
+            ],
+            function: {
+              name: "check_availability",
+              description: "Queries the Google Calendar to find all busy/occupied time slots for a specific date.",
+              parameters: {
+                type: "object",
+                properties: {
+                  date: { type: "string", description: "The date to check in YYYY-MM-DD format." }
+                },
+                required: ["date"]
+              }
+            }
+          },
+          {
+            type: "function",
+            messages: [
+              {
+                type: "request-start",
+                content: "Give me one second while I get that booked for you."
+              }
+            ],
+            function: {
+              name: "book_appointment",
+              description: "Books an appointment on the clinic's Google Calendar. ONLY call this when the user has provided their name, phone number, and requested a specific date and time.",
+              parameters: {
+                type: "object",
+                properties: {
+                  date: { type: "string", description: "The date in YYYY-MM-DD format." },
+                  time: { type: "string", description: "The time in HH:MM format (24-hour UTC)." },
+                  durationMinutes: { type: "number", description: "The duration in minutes." },
+                  patientName: { type: "string", description: "The name of the patient." },
+                  patientPhone: { type: "string", description: "The phone number of the patient." }
+                },
+                required: ["date", "time", "durationMinutes", "patientName", "patientPhone"]
+              }
+            }
+          }
+        ]
       },
       voice: {
         provider: isOpenAI ? "openai" : "11labs",
