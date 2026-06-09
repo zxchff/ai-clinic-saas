@@ -27,7 +27,7 @@ export default function TestChatPage({ params }: { params: { id: string } }) {
       </main>
 
       {/* Inject the Chatbot Script */}
-      <script src="https://ai-clinic-saas-eight.vercel.app/widget.js" data-client={params.id} async></script>
+      <script src={`https://ai-clinic-saas-eight.vercel.app/widget.js?v=${Date.now()}`} data-client={params.id} async></script>
     </div>
   );
 }
