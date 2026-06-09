@@ -55,6 +55,10 @@ You are reading an incoming email from a patient. Write a professional email rep
 DO NOT act like a chatbot. Act like a human receptionist replying to an email.
 ${client.emailInstructions || ""}
 
+=== RULE #3: SPAM & NON-PATIENT FILTERING ===
+If this email is clearly a newsletter, spam, advertisement, or an automated system notification, reply with EXACTLY the word "IGNORE_EMAIL" and nothing else. 
+However, if it is a real patient (even if they are asking a complex question you cannot answer), do NOT ignore it. Instead, reply professionally stating that a human staff member will review their request and get back to them shortly.
+
 === KNOWLEDGE BASE ===
 ${client.rulebook}
 
@@ -159,12 +163,15 @@ You MUST STRICTLY enforce these scheduling rules.`;
       const toEmailMatch = email.from.match(/<([^>]+)>/);
       const toEmail = toEmailMatch ? toEmailMatch[1] : email.from;
       
-      if (finalReplyText) {
+      // 5. Send the reply back to the patient
+      if (finalReplyText.trim() === "IGNORE_EMAIL") {
+        console.log(`Skipping reply for spam/newsletter from ${email.from}`);
+      } else {
         await sendEmailReply(client.googleRefreshToken, toEmail, email.subject, finalReplyText, email.threadId || "");
         console.log(`Sent reply to ${toEmail}`);
       }
-
-      // 5. Mark the original email as read
+      
+      // 6. Mark as read
       await markEmailAsRead(client.googleRefreshToken, email.id);
       processedCount++;
     }
