@@ -29,7 +29,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ reply: `DEBUG ERROR: The backend successfully found Zach's Dental, but your Chatbot Instructions are blank in the database! Did you click Save Settings?` });
     }
 
-    systemPrompt = `CORE KNOWLEDGE BASE:\n${client.rulebook}\n\nCHATBOT PERSONALITY INSTRUCTIONS:\n${client.chatInstructions}\n\nCRITICAL SCHEDULING RULES:\n${client.schedulingRules || "You can book appointments at any valid business time."}\nYou MUST STRICTLY enforce these scheduling rules when using the book_appointment tool.\n\nCRITICAL MEMORY DIRECTIVE: You have a specific personality, but you MUST NOT pretend to forget information the user has already provided. If the user gives partial information (like just the time), remember it, and ONLY ask for the missing information. DO NOT ask the user to repeat themselves or pretend you didn't hear them.`;
+    const now = new Date();
+    const currentDate = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    systemPrompt = `[CRITICAL SYSTEM INFO: Today is ${currentDate}. The current time is ${currentTime}. Assume all appointments are for the current year unless specified otherwise.]\n\nCORE KNOWLEDGE BASE:\n${client.rulebook}\n\nCHATBOT PERSONALITY INSTRUCTIONS:\n${client.chatInstructions}\n\nCRITICAL SCHEDULING RULES:\n${client.schedulingRules || "You can book appointments at any valid business time."}\nYou MUST STRICTLY enforce these scheduling rules when using the book_appointment tool.\n\nCRITICAL MEMORY DIRECTIVE: You have a specific personality, but you MUST NOT pretend to forget information the user has already provided. If the user gives partial information (like just the time), remember it, and ONLY ask for the missing information. DO NOT ask the user to repeat themselves or pretend you didn't hear them.`;
 
     // 2. Format messages for Gemini using the dynamic Rulebook
     let history = messages.slice(0, -1).map((msg: any) => ({
