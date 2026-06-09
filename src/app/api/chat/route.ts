@@ -13,14 +13,23 @@ export async function POST(req: Request) {
     // 1. Fetch the specific client from our Database!
     let systemPrompt = "You are a helpful AI receptionist.";
     
-    if (clientId) {
-      const client = await prisma.client.findUnique({
-        where: { id: clientId }
-      });
-      if (client) {
-        systemPrompt = `CORE KNOWLEDGE BASE:\n${client.rulebook}\n\nCHATBOT PERSONALITY INSTRUCTIONS:\n${client.chatInstructions}`;
-      }
+    if (!clientId) {
+      return NextResponse.json({ reply: "DEBUG ERROR: The backend API received your message, but the Client ID was completely missing! The widget failed to send it." });
     }
+
+    const client = await prisma.client.findUnique({
+      where: { id: clientId }
+    });
+
+    if (!client) {
+      return NextResponse.json({ reply: `DEBUG ERROR: The backend API received Client ID [${clientId}], but could not find Zach's Dental in the database!` });
+    }
+
+    if (!client.chatInstructions) {
+      return NextResponse.json({ reply: `DEBUG ERROR: The backend successfully found Zach's Dental, but your Chatbot Instructions are blank in the database! Did you click Save Settings?` });
+    }
+
+    systemPrompt = `CORE KNOWLEDGE BASE:\n${client.rulebook}\n\nCHATBOT PERSONALITY INSTRUCTIONS:\n${client.chatInstructions}`;
 
     // 2. Format messages for Gemini using the dynamic Rulebook
     const history = messages.slice(0, -1).map((msg: any) => ({
