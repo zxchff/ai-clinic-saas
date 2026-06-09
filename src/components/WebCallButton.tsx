@@ -57,6 +57,7 @@ export default function WebCallButton({ client }: { client: any }) {
 
     const assistantOverrides = {
       name: `${client.name || "Clinic"} Web Tester`,
+      firstMessage: `Hello! This is ${client.name || "the clinic"}. How can I help you today?`,
       model: {
         provider: "openai",
         model: "gpt-4o",
