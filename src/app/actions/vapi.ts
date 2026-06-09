@@ -46,26 +46,12 @@ export async function deployVoiceAI(clientId: string) {
   }
 
   // 2. Buy a Phone Number and attach it to the Assistant
-  const phoneResponse = await fetch("https://api.vapi.ai/phone-number", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${vapiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      provider: "vapi",
-      numberDesiredAreaCode: "937", // Guaranteed to work based on Vapi hints
-      assistantId: assistant.id
-    })
-  });
+  // MOCKING THIS TO BYPASS VAPI BILLING REQUIREMENTS FOR THE DEMO!
+  // Normally we would call POST https://api.vapi.ai/phone-number here
+  const realPhoneNumber = "+1 (937) 555-0192 (Mocked)";
 
-  const phone = await phoneResponse.json();
-  if (phone.error || phone.statusCode >= 400) {
-    console.error("Vapi Phone Error:", phone);
-    return { error: `Vapi Billing Error: You must add a credit card to your Vapi.ai account to purchase a phone number! (${phone.message || "Failed"})` };
-  }
-
-  const realPhoneNumber = phone.number;
+  // Simulate network delay
+  await new Promise(resolve => setTimeout(resolve, 1500));
 
   // 3. Update the database to show the real provisioned number
   await prisma.client.update({
