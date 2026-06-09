@@ -9,6 +9,7 @@ import VoiceSelector from "@/components/VoiceSelector";
 import SaveButton from "@/components/SaveButton";
 import WebCallButton from "@/components/WebCallButton";
 import ImportedNumberSelector from "@/components/ImportedNumberSelector";
+import ClientPortalButton from "@/components/ClientPortalButton";
 
 import { deployChatbot, deployEmailBot, undeployEngine } from "@/app/actions/vapi";
 import { updateCRMFields, deleteClient, globalKillSwitch } from "@/app/actions/crm";
@@ -68,6 +69,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
           </div>
           
           <div className="flex gap-3">
+            <ClientPortalButton clientId={client.id} portalToken={client.portalToken || ""} />
             <DeployVoiceButton clientId={client.id} />
             
             {/* Global Kill Switch */}
