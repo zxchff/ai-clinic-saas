@@ -2,7 +2,7 @@
 (function() {
   // Get the client ID from the script tag
   const scriptTag = document.currentScript || document.querySelector('script[data-client]');
-  const clientId = scriptTag ? scriptTag.getAttribute("data-client") : null;
+  const clientId = window.AI_CLINIC_CLIENT_ID || (scriptTag ? scriptTag.getAttribute("data-client") : null);
 
   // Create the floating button
   const button = document.createElement("div");
