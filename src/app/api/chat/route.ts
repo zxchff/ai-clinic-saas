@@ -122,10 +122,11 @@ export async function POST(req: Request) {
         // Push the event to Google Calendar
         const result = await bookAppointment(clientId, args.patientName, args.patientPhone, args.date, args.time, args.durationMinutes);
         
-        // Tell Gemini the result so it can reply to the user
-        response = await chatSession.sendMessage({
-          message: [{ functionResponse: { name: "book_appointment", response: result } }] as any
-        });
+        if (result.success) {
+          return NextResponse.json({ reply: "✅ Appointment successfully booked! I've added it to the calendar. Is there anything else I can help you with?" });
+        } else {
+          return NextResponse.json({ reply: `❌ I couldn't book the appointment: ${result.message || result.error}` });
+        }
       }
     }
 
