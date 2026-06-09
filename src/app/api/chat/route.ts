@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const currentDate = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-    systemPrompt = `[CRITICAL SYSTEM INFO: Today is ${currentDate}. The current time is ${currentTime}. Assume all appointments are for the current year unless specified otherwise.]\n\nCORE KNOWLEDGE BASE:\n${client.rulebook}\n\nCHATBOT PERSONALITY INSTRUCTIONS:\n${client.chatInstructions}\n\nCRITICAL SCHEDULING RULES:\n${client.schedulingRules || "You can book appointments at any valid business time."}\nYou MUST STRICTLY enforce these scheduling rules when using the book_appointment tool.\n\nCRITICAL LENIENCY DIRECTIVE: Do not be overly strict when asking for information. If the user says "4 oclock", assume PM unless otherwise specified. Do not interrogate them. If they provide partial information, happily accept it and only ask for what is missing. DO NOT ask for their phone number unless your personality strictly requires it.`;
+    systemPrompt = `[CRITICAL SYSTEM INFO: Today is ${currentDate}. The current time is ${currentTime}. Assume all appointments are for the current year unless specified otherwise.]\n\nCORE KNOWLEDGE BASE:\n${client.rulebook}\n\nCHATBOT PERSONALITY INSTRUCTIONS:\n${client.chatInstructions}\n\nCRITICAL SCHEDULING RULES:\n${client.schedulingRules || "You can book appointments at any valid business time."}\nYou MUST STRICTLY enforce these scheduling rules when using the book_appointment tool.\n\nCRITICAL LENIENCY DIRECTIVE: Do not be overly strict when asking for information. If the user says "4 oclock", assume PM unless otherwise specified. Do not interrogate them. If they provide partial information, happily accept it and only ask for what is missing. You MUST collect their phone number to book, but ask for it nicely.`;
 
     // 2. Format messages for Gemini using the dynamic Rulebook
     let history = messages.slice(0, -1).map((msg: any) => ({
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
                       description: "The phone number of the patient.",
                     },
                   },
-                  required: ["date", "time", "patientName"],
+                  required: ["date", "time", "patientName", "patientPhone"],
                 },
               },
             ],
