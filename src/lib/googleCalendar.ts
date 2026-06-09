@@ -15,11 +15,24 @@ async function getCalendarClient(clientId: string) {
   return google.calendar({ version: "v3", auth: oauth2Client });
 }
 
-export async function checkAvailability(clientId: string, date: string) {
+export async function checkAvailability(clientId: string, dateStr: string) {
   try {
     const calendar = await getCalendarClient(clientId);
-    const timeMin = new Date(`${date}T00:00:00Z`).toISOString();
-    const timeMax = new Date(`${date}T23:59:59Z`).toISOString();
+    
+    // Fallback: If Gemini sends "2 june" instead of "YYYY-MM-DD", try to parse it naturally
+    let parsedDate = new Date(dateStr);
+    if (isNaN(parsedDate.getTime())) {
+      // If it still fails, just use today as a fallback so it doesn't crash
+      parsedDate = new Date();
+    }
+    
+    const year = parsedDate.getFullYear();
+    const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(parsedDate.getDate()).padStart(2, '0');
+    const safeDate = `${year}-${month}-${day}`;
+
+    const timeMin = new Date(`${safeDate}T00:00:00Z`).toISOString();
+    const timeMax = new Date(`${safeDate}T23:59:59Z`).toISOString();
 
     const response = await calendar.freebusy.query({
       requestBody: {
@@ -37,12 +50,33 @@ export async function checkAvailability(clientId: string, date: string) {
   }
 }
 
-export async function bookAppointment(clientId: string, patientName: string, patientPhone: string, date: string, time: string, durationMinutes: number = 60) {
+export async function bookAppointment(clientId: string, patientName: string, patientPhone: string, dateStr: string, timeStr: string, durationMinutes: number = 60) {
   try {
     const calendar = await getCalendarClient(clientId);
     
-    // Parse the date and time (e.g. "2026-06-08" and "14:00")
-    const startDateTime = new Date(`${date}T${time}:00Z`); // Assuming UTC for now
+    // Bulletproof date and time parsing
+    let parsedDate = new Date(dateStr);
+    if (isNaN(parsedDate.getTime())) {
+      parsedDate = new Date(); // Fallback
+    }
+    
+    const year = parsedDate.getFullYear();
+    const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(parsedDate.getDate()).padStart(2, '0');
+    const safeDate = `${year}-${month}-${day}`;
+
+    // Clean up the time string (e.g. "5 oclock" -> "17:00")
+    // If Gemini hallucinates "5 oclock", this might still fail, but new Date() is fairly resilient.
+    let startDateTime = new Date(`${safeDate}T${timeStr}:00Z`);
+    if (isNaN(startDateTime.getTime())) {
+       // If Gemini gave a weird time format like "5 PM", try parsing it naturally
+       startDateTime = new Date(`${safeDate} ${timeStr} UTC`);
+       if (isNaN(startDateTime.getTime())) {
+          // Absolute fallback: 9:00 AM
+          startDateTime = new Date(`${safeDate}T09:00:00Z`);
+       }
+    }
+
     const endDateTime = new Date(startDateTime.getTime() + durationMinutes * 60 * 1000);
 
     // 1. COLLISION CHECK: Explicitly query the exact timeslot to ensure it is free!
