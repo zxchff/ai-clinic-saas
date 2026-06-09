@@ -134,8 +134,10 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             </div>
           </form>
 
-          <div className="grid grid-cols-1 gap-8">
-            
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-8">
+          
+          <div className="space-y-8">
+            <CommandCopilot clientId={client.id} />
             {/* 1. Voice AI Engine */}
             <form action={updateAI} className="glass-panel glow-voice rounded-2xl overflow-hidden relative shadow-lg group">
               <div className="absolute top-0 right-0 w-64 h-64 bg-violet-600/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none transition-opacity group-hover:bg-violet-600/20"></div>
