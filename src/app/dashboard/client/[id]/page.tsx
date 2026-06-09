@@ -6,6 +6,7 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import DeployVoiceButton from "@/components/DeployVoiceButton";
 import VoiceSelector from "@/components/VoiceSelector";
+import SaveButton from "@/components/SaveButton";
 
 import { deployChatbot, deployEmailBot, undeployEngine } from "@/app/actions/vapi";
 import { updateCRMFields, deleteClient, globalKillSwitch } from "@/app/actions/crm";
@@ -85,9 +86,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
                 📊 CRM & Billing Settings
               </h2>
-              <button type="submit" className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg font-bold transition-colors text-sm border border-white/10">
-                Save CRM Data
-              </button>
+              <SaveButton defaultText="Save CRM Data" />
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10">
@@ -150,9 +149,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     <p className="text-zinc-400 mt-1">24/7 inbound and outbound phone receptionist.</p>
                   </div>
                   <div className="flex items-center gap-3 flex-wrap">
-                    <button type="submit" className="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-lg font-bold transition-colors text-sm">
-                      Save Settings
-                    </button>
+                    <SaveButton />
 
                     {client.googleSheetsId ? (
                       <span className="bg-green-950/50 text-green-400 border border-green-900/50 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
@@ -206,9 +203,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     <p className="text-zinc-400 mt-1">Embeddable smart widget for the client&apos;s website.</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button type="submit" className="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-lg font-bold transition-colors text-sm">
-                      Save Settings
-                    </button>
+                    <SaveButton />
                     {client.chatbotEmbedCode ? (
                       <button formAction={async () => { "use server"; await undeployEngine(client.id, "CHAT"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
                         Stop Engine
@@ -256,9 +251,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     <p className="text-zinc-400 mt-1">Auto-draft replies to inbound patient emails.</p>
                   </div>
                   <div className="flex items-center gap-3">
-                    <button type="submit" className="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-lg font-bold transition-colors text-sm">
-                      Save Settings
-                    </button>
+                    <SaveButton />
                     {client.connectedEmail ? (
                       <button formAction={async () => { "use server"; await undeployEngine(client.id, "EMAIL"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
                         Stop Engine
