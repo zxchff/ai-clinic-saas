@@ -16,6 +16,53 @@ import { updateCRMFields, deleteClient, globalKillSwitch } from "@/app/actions/c
 
 export const dynamic = "force-dynamic";
 
+const SharedKnowledgeFields = ({ client }: { client: any }) => (
+  <div className="space-y-6 mt-6 pt-6 border-t border-white/5">
+    <div>
+      <label className="block text-sm font-medium text-zinc-300 mb-2">General Rulebook & Business Info</label>
+      <textarea 
+        name="rulebook"
+        defaultValue={client.rulebook || ""}
+        rows={6}
+        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all font-mono text-sm leading-relaxed"
+        placeholder="Business Name: Zach's Dental\nAddress: 123 Main St...\nServices: Teeth Whitening, Implants..."
+      />
+    </div>
+    
+    <div>
+      <label className="block text-sm font-medium text-zinc-300 mb-2">📅 Scheduling Rules & Instructions</label>
+      <textarea 
+        name="schedulingRules"
+        defaultValue={client.schedulingRules || ""}
+        rows={4}
+        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all font-mono text-sm leading-relaxed shadow-inner"
+        placeholder="E.g. No appointments on Fridays. Lunch break from 12-1pm."
+      />
+    </div>
+
+    <div className="grid grid-cols-2 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-zinc-300 mb-2">Open Time</label>
+        <input 
+          type="time" 
+          name="activeTimeStart" 
+          defaultValue={client.activeTimeStart || "09:00"} 
+          className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-zinc-300 mb-2">Close Time</label>
+        <input 
+          type="time" 
+          name="activeTimeEnd" 
+          defaultValue={client.activeTimeEnd || "17:00"} 
+          className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all"
+        />
+      </div>
+    </div>
+  </div>
+);
+
 export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const session = await getServerSession(authOptions);
@@ -165,9 +212,12 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                         Calendar Active
                       </span>
                     ) : (
-                      <a href={`/api/auth/google?clientId=${client.id}`} className="bg-blue-900/40 hover:bg-blue-800/60 text-blue-400 border border-blue-800 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
-                        Connect Calendar
-                      </a>
+                      <div className="flex flex-col gap-2">
+                        <a href={`/api/auth/google?clientId=${client.id}`} className="bg-blue-900/40 hover:bg-blue-800/60 text-blue-400 border border-blue-800 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                          Connect Google Calendar
+                        </a>
+                        <p className="text-xs text-zinc-500">Redirect URI: <br/><code>https://ai-clinic-saas-eight.vercel.app/api/auth/google/callback</code></p>
+                      </div>
                     )}
 
                     {client.googleSheetsId ? (
@@ -176,9 +226,12 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                         Sheets Active
                       </span>
                     ) : (
-                      <a href={`/api/clients/${client.id}/sheets/auth`} className="bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-400 border border-emerald-800 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
-                        Connect Google Sheets
-                      </a>
+                      <div className="flex flex-col gap-2">
+                        <a href={`/api/clients/${client.id}/sheets/auth`} className="bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-400 border border-emerald-800 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                          Connect Google Sheets
+                        </a>
+                        <p className="text-xs text-zinc-500">Redirect URI: <br/><code>https://ai-clinic-saas-eight.vercel.app/api/oauth/sheets/callback</code></p>
+                      </div>
                     )}
 
                     {client.googleRefreshToken ? (
@@ -215,60 +268,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center mb-6">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                      🧠 Core Knowledge Base
-                    </h2>
-                    <p className="text-zinc-400 mt-1 text-sm">This is the central brain for all your AI engines. Update your business hours and policies here.</p>
-                  </div>
-                  <SaveButton />
-                </div>
 
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-300 mb-2">General Rulebook</label>
-                    <textarea 
-                      name="rulebook"
-                      defaultValue={client.rulebook || ""}
-                      rows={8}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all font-mono text-sm leading-relaxed shadow-inner"
-                      placeholder="Business Name: Zach's Dental\nAddress: 123 Main St...\nServices: Teeth Whitening, Implants..."
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-300 mb-2">📅 Scheduling & Appointment Rules</label>
-                    <textarea 
-                      name="schedulingRules"
-                      defaultValue={client.schedulingRules || ""}
-                      rows={4}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all font-mono text-sm leading-relaxed shadow-inner"
-                      placeholder="E.g. No appointments on Fridays. Lunch break from 12-1pm."
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-zinc-300 mb-2">Open Time</label>
-                      <input 
-                        type="time" 
-                        name="activeTimeStart" 
-                        defaultValue={client.activeTimeStart || "09:00"} 
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-zinc-300 mb-2">Close Time</label>
-                      <input 
-                        type="time" 
-                        name="activeTimeEnd" 
-                        defaultValue={client.activeTimeEnd || "17:00"} 
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all"
-                      />
-                    </div>
-                  </div>
-                </div>
 
                 <div className="mt-8">
                   <label className="block text-sm font-medium text-zinc-300 mb-2">Voice Receptionist Instructions</label>
@@ -282,6 +282,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                 </div>
                 
                 <VoiceSelector defaultVoice={client.voiceId || "rachel"} defaultCountry={client.countryCode || "+1"} />
+                <SharedKnowledgeFields client={client} />
               </div>
             </form>
 
@@ -345,6 +346,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     placeholder="Keep answers short. Use emojis. Ask for email..."
                   />
                 </div>
+                <SharedKnowledgeFields client={client} />
               </div>
             </form>
 
@@ -402,6 +404,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     placeholder="Write formally. Always include the clinic signature..."
                   />
                 </div>
+                <SharedKnowledgeFields client={client} />
               </div>
             </form>
 
