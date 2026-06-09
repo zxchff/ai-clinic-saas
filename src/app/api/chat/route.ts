@@ -83,7 +83,7 @@ export async function POST(req: Request) {
                       description: "The phone number of the patient.",
                     },
                   },
-                  required: ["date", "time", "durationMinutes", "patientName", "patientPhone"],
+                  required: ["date", "time", "patientName", "patientPhone"],
                 },
               },
             ],
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
     });
 
     const lastUserMessage = messages[messages.length - 1].content;
-    let response = await chatSession.sendMessage({ message: lastUserMessage });
+    let response = await chatSession.sendMessage(lastUserMessage);
 
     // 3. Check if Gemini decided to call our Calendar Tools!
     if (response.functionCalls && response.functionCalls.length > 0) {
@@ -104,9 +104,7 @@ export async function POST(req: Request) {
         const { checkAvailability } = await import('@/lib/googleCalendar');
         const result = await checkAvailability(clientId, args.date);
         
-        response = await chatSession.sendMessage({
-          message: [{ functionResponse: { name: "check_availability", response: result } }] as any
-        });
+        response = await chatSession.sendMessage([{ functionResponse: { name: "check_availability", response: result } }]);
       }
       
       else if (call.name === "book_appointment" && clientId) {
@@ -117,9 +115,7 @@ export async function POST(req: Request) {
         const result = await bookAppointment(clientId, args.patientName, args.patientPhone, args.date, args.time, args.durationMinutes);
         
         // Tell Gemini the result so it can reply to the user
-        response = await chatSession.sendMessage({
-          message: [{ functionResponse: { name: "book_appointment", response: result } }] as any
-        });
+        response = await chatSession.sendMessage([{ functionResponse: { name: "book_appointment", response: result } }]);
       }
     }
 
