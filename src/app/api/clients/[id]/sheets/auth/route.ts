@@ -11,7 +11,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  let appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  if (!appUrl.startsWith("http")) appUrl = `https://${appUrl}`;
+  if (appUrl.endsWith("/")) appUrl = appUrl.slice(0, -1);
+  
   const redirectUri = `${appUrl}/api/oauth/sheets/callback`;
 
   const oauth2Client = new google.auth.OAuth2(

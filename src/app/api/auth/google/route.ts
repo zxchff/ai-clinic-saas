@@ -12,7 +12,9 @@ export async function GET(req: Request) {
   // Get the actual domain from Vercel headers
   const protocol = req.headers.get("x-forwarded-proto") || "http";
   const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || "localhost:3000";
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+  let appUrl = process.env.NEXT_PUBLIC_APP_URL || `${protocol}://${host}`;
+  if (!appUrl.startsWith("http")) appUrl = `https://${appUrl}`;
+  if (appUrl.endsWith("/")) appUrl = appUrl.slice(0, -1);
 
   const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
