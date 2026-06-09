@@ -55,13 +55,14 @@ export default function CrmSpreadsheet({ initialClients, todayStr }: { initialCl
               <th className="px-4 py-3 font-medium uppercase tracking-wider text-xs w-36">Follow-Up 1</th>
               <th className="px-4 py-3 font-medium uppercase tracking-wider text-xs w-36">Follow-Up 2</th>
               <th className="px-4 py-3 font-medium uppercase tracking-wider text-xs w-36">Follow-Up 3</th>
+              <th className="px-4 py-3 font-medium uppercase tracking-wider text-xs w-36">Follow-Up 4</th>
               <th className="px-4 py-3 font-medium uppercase tracking-wider text-xs text-right">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {filteredClients.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-6 py-12 text-center text-zinc-500">
+                <td colSpan={9} className="px-6 py-12 text-center text-zinc-500">
                   {search ? "No clients match your search." : "No clients found. Click '+ Add New Client' above."}
                 </td>
               </tr>
@@ -139,6 +140,14 @@ export default function CrmSpreadsheet({ initialClients, todayStr }: { initialCl
                     value={client.followUp3 ? new Date(client.followUp3).toISOString().split('T')[0] : ""} 
                     onChange={(e) => handleEdit(client.id, "followUp3", e.target.value)}
                     className={`w-full bg-transparent focus:outline-none focus:bg-white/10 rounded px-1 -ml-1 transition-colors cursor-pointer [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-50 ${isDue(client.followUp3) ? 'text-amber-400 font-bold' : 'text-zinc-400'}`}
+                  />
+                </td>
+                <td className="px-4 py-3">
+                  <input 
+                    type="date" 
+                    value={client.followUp4 ? new Date(client.followUp4).toISOString().split('T')[0] : ""} 
+                    onChange={(e) => handleEdit(client.id, "followUp4", e.target.value)}
+                    className={`w-full bg-transparent focus:outline-none focus:bg-white/10 rounded px-1 -ml-1 transition-colors cursor-pointer [&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-50 ${isDue(client.followUp4) ? 'text-amber-400 font-bold' : 'text-zinc-400'}`}
                   />
                 </td>
                 <td className="px-4 py-3 text-right">

@@ -57,6 +57,9 @@ export default async function AgencyDashboard() {
       if (c.followUp1 && c.followUp1 <= today) followUpCount++;
       if (c.followUp2 && c.followUp2 <= today) followUpCount++;
       if (c.followUp3 && c.followUp3 <= today) followUpCount++;
+      if (c.followUp4 && c.followUp4 <= today) followUpCount++;
+      // We can also count nextFollowUpDate if they checked them all
+      if (c.nextFollowUpDate && c.nextFollowUpDate <= today) followUpCount++;
     }
   });
 
@@ -80,6 +83,20 @@ export default async function AgencyDashboard() {
             </form>
           </div>
         </header>
+
+        {followUpCount > 0 && (
+          <div className="bg-amber-900/40 border border-amber-500/50 rounded-2xl p-6 mb-8 flex items-center justify-between shadow-[0_0_30px_rgba(245,158,11,0.2)]">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-full bg-amber-500/20 flex items-center justify-center border border-amber-500/50">
+                <span className="text-2xl animate-pulse">🔥</span>
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-amber-400 uppercase tracking-widest">Action Required</h2>
+                <p className="text-amber-200/80 mt-1 font-medium">You have <span className="text-white font-bold">{followUpCount}</span> follow-ups due today. Check the spreadsheet below!</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* AI Billing Assistant Widget */}
         <div className="glass-panel rounded-2xl p-6 mb-8 border border-white/5 flex flex-col md:flex-row gap-6 justify-between items-center">

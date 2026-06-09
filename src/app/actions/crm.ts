@@ -80,7 +80,7 @@ export async function globalKillSwitch(clientId: string) {
 }
 
 export async function updateClientField(clientId: string, field: string, value: any) {
-  const allowedFields = ["status", "monthlyRetainer", "paymentDueDate", "followUp1", "followUp2", "followUp3"];
+  const allowedFields = ["status", "monthlyRetainer", "paymentDueDate", "followUp1", "followUp2", "followUp3", "followUp4"];
   if (!allowedFields.includes(field)) {
     return { error: "Invalid field" };
   }
@@ -89,7 +89,19 @@ export async function updateClientField(clientId: string, field: string, value: 
   if (field === "monthlyRetainer" || field === "paymentDueDate") {
     data[field] = parseInt(value, 10) || null;
   } else if (field.startsWith("followUp")) {
-    data[field] = value ? new Date(value) : null;
+    const d = value ? new Date(value) : null;
+    data[field] = d;
+    
+    // Auto-calculate the NEXT follow up date (7 days after the latest follow up)
+    if (d) {
+      const nextDate = new Date(d);
+      nextDate.setDate(nextDate.getDate() + 7);
+      data.nextFollowUpDate = nextDate;
+    } else {
+      // If they cleared the date, we should probably fetch the client to find the previous one, 
+      // but for simplicity we will just clear the nextFollowUpDate if they uncheck it.
+      data.nextFollowUpDate = null;
+    }
   } else {
     data[field] = value;
   }

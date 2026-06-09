@@ -52,6 +52,8 @@ model Client {
   followUp1          DateTime?
   followUp2          DateTime?
   followUp3          DateTime?
+  followUp4          DateTime?
+  nextFollowUpDate   DateTime?
 
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
