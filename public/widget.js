@@ -1,8 +1,8 @@
 // AI Clinic SaaS - Embeddable Chatbot Widget
 (function() {
   // Get the client ID from the script tag
-  const scriptTag = document.currentScript;
-  const clientId = scriptTag.getAttribute("data-client");
+  const scriptTag = document.currentScript || document.querySelector('script[data-client]');
+  const clientId = scriptTag ? scriptTag.getAttribute("data-client") : null;
 
   // Create the floating button
   const button = document.createElement("div");
