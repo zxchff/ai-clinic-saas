@@ -146,7 +146,7 @@ export async function deployEmailBot(clientId: string) {
 
   await prisma.client.update({
     where: { id: clientId },
-    data: { connectedEmail: "hello@clinic.com" }
+    data: { connectedEmail: "Gmail API Connected" }
   });
 
   revalidatePath(`/dashboard/client/${clientId}`);
