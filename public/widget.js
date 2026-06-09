@@ -52,12 +52,13 @@
     win.style.display = "none";
   });
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!input.value.trim()) return;
     
     // User message
+    const userText = input.value;
     const userMsg = document.createElement("div");
-    userMsg.innerHTML = `<div style="background-color: #3b82f6; color: white; padding: 12px; border-radius: 8px; border-bottom-right-radius: 0; max-width: 80%; align-self: flex-end; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">${input.value}</div>`;
+    userMsg.innerHTML = `<div style="background-color: #3b82f6; color: white; padding: 12px; border-radius: 8px; border-bottom-right-radius: 0; max-width: 80%; align-self: flex-end; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">${userText}</div>`;
     userMsg.style.display = "flex";
     userMsg.style.flexDirection = "column";
     messages.appendChild(userMsg);
@@ -65,15 +66,48 @@
     input.value = "";
     messages.scrollTop = messages.scrollHeight;
 
-    // AI Reply (Mocked)
-    setTimeout(() => {
+    // Show typing indicator
+    const typingMsg = document.createElement("div");
+    typingMsg.id = "ai-clinic-typing";
+    typingMsg.innerHTML = `<div style="background-color: white; color: #9ca3af; padding: 12px; border-radius: 8px; border-bottom-left-radius: 0; max-width: 80%; align-self: flex-start; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">Typing...</div>`;
+    typingMsg.style.display = "flex";
+    typingMsg.style.flexDirection = "column";
+    messages.appendChild(typingMsg);
+    messages.scrollTop = messages.scrollHeight;
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId: clientId,
+          messages: [{ role: "user", content: userText }]
+        })
+      });
+      const data = await response.json();
+      
+      // Remove typing indicator
+      const typingEl = document.getElementById("ai-clinic-typing");
+      if (typingEl) typingEl.remove();
+
+      // AI Reply
       const aiMsg = document.createElement("div");
-      aiMsg.innerHTML = `<div style="background-color: white; color: #1f2937; padding: 12px; border-radius: 8px; border-bottom-left-radius: 0; max-width: 80%; align-self: flex-start; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">That's a great question! I'm an AI testing widget, so I don't have a real backend connected yet, but imagine me booking an appointment right now!</div>`;
+      aiMsg.innerHTML = `<div style="background-color: white; color: #1f2937; padding: 12px; border-radius: 8px; border-bottom-left-radius: 0; max-width: 80%; align-self: flex-start; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">${data.reply || "Error: No response"}</div>`;
       aiMsg.style.display = "flex";
       aiMsg.style.flexDirection = "column";
       messages.appendChild(aiMsg);
       messages.scrollTop = messages.scrollHeight;
-    }, 1000);
+    } catch (error) {
+      const typingEl = document.getElementById("ai-clinic-typing");
+      if (typingEl) typingEl.remove();
+      
+      const errMsg = document.createElement("div");
+      errMsg.innerHTML = `<div style="background-color: #fee2e2; color: #991b1b; padding: 12px; border-radius: 8px; border-bottom-left-radius: 0; max-width: 80%; align-self: flex-start; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">Failed to connect to backend API.</div>`;
+      errMsg.style.display = "flex";
+      errMsg.style.flexDirection = "column";
+      messages.appendChild(errMsg);
+      messages.scrollTop = messages.scrollHeight;
+    }
   };
 
   sendBtn.addEventListener("click", sendMessage);
