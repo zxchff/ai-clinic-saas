@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { bookAppointment } from "@/lib/googleCalendar";
+import prisma from "@/lib/prisma";
+import { google } from "googleapis";
 
 export async function POST(req: Request) {
   try {
