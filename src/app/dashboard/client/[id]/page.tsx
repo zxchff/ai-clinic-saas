@@ -12,6 +12,7 @@ import ImportedNumberSelector from "@/components/ImportedNumberSelector";
 import ClientPortalButton from "@/components/ClientPortalButton";
 import CommandCopilot from "@/components/CommandCopilot";
 import SharedKnowledgeFields from "@/components/SharedKnowledgeFields";
+import SyncEmailButton from "@/components/SyncEmailButton";
 
 import { deployChatbot, deployEmailBot, undeployEngine } from "@/app/actions/vapi";
 import { updateCRMFields, deleteClient, globalKillSwitch } from "@/app/actions/crm";
@@ -326,30 +327,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                       <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Connected Account</p>
                       <p className="text-lg font-medium text-emerald-400">{client.connectedEmail}</p>
                     </div>
-                    <button 
-                      onClick={async (e) => {
-                        e.preventDefault();
-                        const btn = e.currentTarget;
-                        btn.innerHTML = 'Syncing...';
-                        btn.disabled = true;
-                        try {
-                          const res = await fetch('/api/email-sync', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ clientId: client.id })
-                          });
-                          const data = await res.json();
-                          alert(data.message || data.error || 'Sync Complete!');
-                        } catch (err) {
-                          alert('Failed to sync inbox');
-                        }
-                        btn.innerHTML = '🔄 Sync Inbox Now';
-                        btn.disabled = false;
-                      }}
-                      className="bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-400 border border-emerald-800 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2 cursor-pointer"
-                    >
-                      🔄 Sync Inbox Now
-                    </button>
+                    <SyncEmailButton clientId={client.id} />
                   </div>
                 )}
                 <div>
