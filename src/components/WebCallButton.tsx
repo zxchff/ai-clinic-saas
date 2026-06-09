@@ -9,8 +9,7 @@ export default function WebCallButton({ client }: { client: any }) {
   const [callStatus, setCallStatus] = useState<"inactive" | "loading" | "active">("inactive");
 
   useEffect(() => {
-    // Only instantiate Vapi if the key is present
-    const pubKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
+    const pubKey = "a7010333-656d-454d-9d90-3c94398ed18e";
     if (pubKey && !vapiClient) {
       vapiClient = new Vapi(pubKey);
     }
@@ -36,7 +35,7 @@ export default function WebCallButton({ client }: { client: any }) {
   }, []);
 
   const handleStartCall = async () => {
-    const pubKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
+    const pubKey = "a7010333-656d-454d-9d90-3c94398ed18e";
     if (!pubKey) {
       alert("Missing NEXT_PUBLIC_VAPI_PUBLIC_KEY in Vercel Environment Variables!");
       return;
