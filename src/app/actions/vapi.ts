@@ -243,8 +243,6 @@ export async function attachExistingNumber(clientId: string, phoneNumberId: stri
       where: { id: clientId },
       data: {
         vapiPhoneNumber: fullPhoneNumber,
-        vapiPhoneNumberId: phoneNumberId,
-        vapiAssistantId: assistant.id
       }
     });
 
