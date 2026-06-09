@@ -228,7 +228,12 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                 </div>
                 {client.chatbotEmbedCode && (
                   <div className="mb-6 p-4 bg-zinc-950 border border-zinc-800 rounded-xl">
-                    <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Website Embed Code</p>
+                    <div className="flex justify-between items-center mb-2">
+                      <p className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Website Embed Code</p>
+                      <Link href={`/test-chat/${client.id}`} target="_blank" className="bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 px-3 py-1 rounded text-xs font-bold transition-colors">
+                        Preview Widget ↗
+                      </Link>
+                    </div>
                     <code className="text-xs text-purple-400 break-all">{client.chatbotEmbedCode}</code>
                   </div>
                 )}
