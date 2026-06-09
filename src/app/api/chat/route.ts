@@ -32,10 +32,16 @@ export async function POST(req: Request) {
     systemPrompt = `CORE KNOWLEDGE BASE:\n${client.rulebook}\n\nCHATBOT PERSONALITY INSTRUCTIONS:\n${client.chatInstructions}\n\nCRITICAL SCHEDULING RULES:\n${client.schedulingRules || "You can book appointments at any valid business time."}\nYou MUST STRICTLY enforce these scheduling rules when using the book_appointment tool.`;
 
     // 2. Format messages for Gemini using the dynamic Rulebook
-    const history = messages.slice(0, -1).map((msg: any) => ({
+    let history = messages.slice(0, -1).map((msg: any) => ({
       role: msg.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: msg.content }]
     }));
+
+    // Gemini strictly requires history to start with a 'user' message.
+    // If the frontend sent the initial AI greeting ("Hi! I'm the AI..."), we MUST strip it!
+    if (history.length > 0 && history[0].role === 'model') {
+      history.shift();
+    }
 
     const chatSession = ai.chats.create({
       model: 'gemini-2.5-flash',
