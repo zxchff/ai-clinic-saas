@@ -39,6 +39,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
     if (formData.has("phoneInstructions")) dataToUpdate.phoneInstructions = formData.get("phoneInstructions") as string;
     if (formData.has("chatInstructions")) dataToUpdate.chatInstructions = formData.get("chatInstructions") as string;
     if (formData.has("emailInstructions")) dataToUpdate.emailInstructions = formData.get("emailInstructions") as string;
+    if (formData.has("schedulingRules")) dataToUpdate.schedulingRules = formData.get("schedulingRules") as string;
     if (formData.has("countryCode")) dataToUpdate.countryCode = formData.get("countryCode") as string;
     if (formData.has("voiceId")) dataToUpdate.voiceId = formData.get("voiceId") as string;
 
@@ -190,11 +191,46 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     )}
                   </div>
                 </div>
-                <div>
+
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+                      🧠 Core Knowledge Base
+                    </h2>
+                    <p className="text-zinc-400 mt-1 text-sm">This is the central brain for all your AI engines. Update your business hours and policies here.</p>
+                  </div>
+                  <SaveButton />
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-300 mb-2">General Rulebook</label>
+                    <textarea 
+                      name="rulebook"
+                      defaultValue={client.rulebook || ""}
+                      rows={8}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all font-mono text-sm leading-relaxed shadow-inner"
+                      placeholder="Business Name: Zach's Dental\nAddress: 123 Main St...\nServices: Teeth Whitening, Implants..."
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-300 mb-2">📅 Scheduling & Appointment Rules</label>
+                    <textarea 
+                      name="schedulingRules"
+                      defaultValue={client.schedulingRules || ""}
+                      rows={4}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all font-mono text-sm leading-relaxed shadow-inner"
+                      placeholder="E.g. No appointments on Fridays. Lunch break from 12-1pm."
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-8">
                   <label className="block text-sm font-medium text-zinc-300 mb-2">Voice Receptionist Instructions</label>
                   <textarea 
                     name="phoneInstructions"
-                    defaultValue={client.phoneInstructions || client.rulebook}
+                    defaultValue={client.phoneInstructions || ""}
                     rows={5}
                     className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-blue-500 transition-all font-mono text-sm leading-relaxed"
                     placeholder="Speak professionally. Ask for patient name..."

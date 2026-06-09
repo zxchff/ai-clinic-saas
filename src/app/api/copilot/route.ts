@@ -37,10 +37,11 @@ CURRENT DATABASE STATE FOR ${client.name}:
 - Phone Instructions: ${client.phoneInstructions || "Empty"}
 - Chatbot Instructions: ${client.chatInstructions || "Empty"}
 - Email Instructions: ${client.emailInstructions || "Empty"}
+- Scheduling Rules: ${client.schedulingRules || "Empty"}
 - Voice ID: ${client.voiceId || "rachel"}
 
 If the user says "Make the chatbot speak Spanish", use the tool to append "Speak in Spanish." to the chatInstructions. 
-If the user says "We are closed on Fridays", use the tool to append "We are closed on Fridays." to the Core Rulebook.
+If the user says "We are closed on Fridays", use the tool to append "We are closed on Fridays." to the Scheduling Rules.
 IMPORTANT: Do not overwrite the entire field unless requested. If they ask to ADD a rule, rewrite the current state + the new rule.
 After you use the tool, briefly tell the user what you updated (e.g., "Done! I've updated the rulebook to reflect that you are closed on Fridays.").`;
 
@@ -61,6 +62,7 @@ After you use the tool, briefly tell the user what you updated (e.g., "Done! I'v
                     phoneInstructions: { type: Type.STRING, description: "The complete, updated Phone Receptionist Instructions." },
                     chatInstructions: { type: Type.STRING, description: "The complete, updated Website Chatbot Instructions." },
                     emailInstructions: { type: Type.STRING, description: "The complete, updated Email Drafter Instructions." },
+                    schedulingRules: { type: Type.STRING, description: "The complete, updated Scheduling Rules (business hours, breaks, closed days)." },
                     voiceId: { type: Type.STRING, description: "The ID of the Voice (e.g. alloy, shimmer, rachel, etc)." }
                   }
                 }
@@ -86,6 +88,7 @@ After you use the tool, briefly tell the user what you updated (e.g., "Done! I'v
         if (args.phoneInstructions !== undefined) dataToUpdate.phoneInstructions = args.phoneInstructions;
         if (args.chatInstructions !== undefined) dataToUpdate.chatInstructions = args.chatInstructions;
         if (args.emailInstructions !== undefined) dataToUpdate.emailInstructions = args.emailInstructions;
+        if (args.schedulingRules !== undefined) dataToUpdate.schedulingRules = args.schedulingRules;
         if (args.voiceId !== undefined) dataToUpdate.voiceId = args.voiceId;
 
         // Execute the database update

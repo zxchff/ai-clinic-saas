@@ -30,7 +30,7 @@ export async function deployVoiceAI(clientId: string) {
       model: {
         provider: "openai",
         model: "gpt-4o",
-        messages: [{ role: "system", content: client.phoneInstructions || client.rulebook || "You are a helpful receptionist." }]
+        messages: [{ role: "system", content: `${client.phoneInstructions || client.rulebook || "You are a helpful receptionist."}\n\nCRITICAL SCHEDULING RULES:\n${client.schedulingRules || "You can book appointments at any valid business time."}\nYou MUST STRICTLY enforce these scheduling rules when using the book_appointment tool.` }]
       },
       voice: {
         provider: isOpenAI ? "openai" : "11labs",
@@ -165,7 +165,7 @@ export async function attachExistingNumber(clientId: string, phoneNumberId: stri
         model: {
           provider: "openai",
           model: "gpt-4o",
-          messages: [{ role: "system", content: client.phoneInstructions || client.rulebook || "You are a helpful receptionist." }]
+          messages: [{ role: "system", content: `${client.phoneInstructions || client.rulebook || "You are a helpful receptionist."}\n\nCRITICAL SCHEDULING RULES:\n${client.schedulingRules || "You can book appointments at any valid business time."}\nYou MUST STRICTLY enforce these scheduling rules when using the book_appointment tool.` }]
         },
         voice: {
           provider: isOpenAI ? "openai" : "11labs",
