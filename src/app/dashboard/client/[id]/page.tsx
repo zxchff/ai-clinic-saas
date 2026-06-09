@@ -309,6 +309,16 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   </div>
                   <div className="flex items-center gap-3">
                     <SaveButton />
+                    {client.googleRefreshToken ? (
+                      <a href={`/api/auth/google?clientId=${client.id}`} className="bg-green-950/50 hover:bg-green-900/60 text-green-400 border border-green-900/50 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors cursor-pointer" title="Click to reconnect and update permissions">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                        Calendar & Gmail Active (Click to Reconnect)
+                      </a>
+                    ) : (
+                      <a href={`/api/auth/google?clientId=${client.id}`} className="bg-blue-900/40 hover:bg-blue-800/60 text-blue-400 border border-blue-800 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
+                        Connect Google Calendar & Gmail
+                      </a>
+                    )}
                     {client.connectedEmail ? (
                       <button formAction={async () => { "use server"; await undeployEngine(client.id, "EMAIL"); }} className="bg-red-950/50 hover:bg-red-900 border border-red-900/50 text-red-400 hover:text-red-300 px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center gap-2">
                         Stop Engine
