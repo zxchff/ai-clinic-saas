@@ -123,3 +123,88 @@ export async function undeployEngine(clientId: string, engine: "VOICE" | "CHAT" 
   revalidatePath(`/dashboard/client/${clientId}`);
   return { success: true };
 }
+
+// === NEW ACTIONS FOR CUSTOM TWILIO NUMBERS ===
+
+export async function getImportedNumbers() {
+  const vapiKey = process.env.VAPI_PRIVATE_KEY;
+  if (!vapiKey) return { error: "Missing VAPI_PRIVATE_KEY" };
+
+  try {
+    const res = await fetch("https://api.vapi.ai/phone-number", {
+      headers: { "Authorization": `Bearer ${vapiKey}` }
+    });
+    const data = await res.json();
+    if (!res.ok) return { error: data.message || "Failed to fetch numbers" };
+    return { numbers: data };
+  } catch (e: any) {
+    return { error: e.message };
+  }
+}
+
+export async function attachExistingNumber(clientId: string, phoneNumberId: string, fullPhoneNumber: string) {
+  const client = await prisma.client.findUnique({ where: { id: clientId } });
+  if (!client) return { error: "Client not found" };
+
+  const vapiKey = process.env.VAPI_PRIVATE_KEY;
+  if (!vapiKey) return { error: "Missing VAPI_PRIVATE_KEY" };
+
+  try {
+    // 1. Create or update the Assistant
+    const voiceId = client.voiceId || "rachel";
+    const isOpenAI = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"].includes(voiceId);
+
+    const assistantResponse = await fetch("https://api.vapi.ai/assistant", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${vapiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: `${client.name || "Clinic"} Receptionist`,
+        model: {
+          provider: "openai",
+          model: "gpt-4o",
+          messages: [{ role: "system", content: client.phoneInstructions || client.rulebook || "You are a helpful receptionist." }]
+        },
+        voice: {
+          provider: isOpenAI ? "openai" : "11labs",
+          voiceId: voiceId
+        }
+      })
+    });
+    
+    const assistant = await assistantResponse.json();
+    if (assistant.error) return { error: "Failed to create Assistant" };
+
+    // 2. Attach the existing phone number to the Assistant via PATCH
+    const attachRes = await fetch(`https://api.vapi.ai/phone-number/${phoneNumberId}`, {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${vapiKey}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        assistantId: assistant.id
+      })
+    });
+
+    const attachData = await attachRes.json();
+    if (!attachRes.ok) return { error: attachData.message || "Failed to attach number" };
+
+    // 3. Save to database
+    await prisma.client.update({
+      where: { id: clientId },
+      data: {
+        vapiPhoneNumber: fullPhoneNumber,
+        vapiPhoneNumberId: phoneNumberId,
+        vapiAssistantId: assistant.id
+      }
+    });
+
+    revalidatePath(`/dashboard/client/${clientId}`);
+    return { success: true };
+  } catch (e: any) {
+    return { error: e.message };
+  }
+}

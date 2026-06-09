@@ -8,6 +8,7 @@ import DeployVoiceButton from "@/components/DeployVoiceButton";
 import VoiceSelector from "@/components/VoiceSelector";
 import SaveButton from "@/components/SaveButton";
 import WebCallButton from "@/components/WebCallButton";
+import ImportedNumberSelector from "@/components/ImportedNumberSelector";
 
 import { deployChatbot, deployEmailBot, undeployEngine } from "@/app/actions/vapi";
 import { updateCRMFields, deleteClient, globalKillSwitch } from "@/app/actions/crm";
@@ -178,7 +179,10 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                         </button>
                       </>
                     ) : (
-                      <DeployVoiceButton clientId={client.id} />
+                      <>
+                        <DeployVoiceButton clientId={client.id} />
+                        <ImportedNumberSelector clientId={client.id} />
+                      </>
                     )}
                   </div>
                 </div>
