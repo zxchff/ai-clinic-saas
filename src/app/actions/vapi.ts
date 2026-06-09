@@ -84,7 +84,7 @@ export async function deployVoiceAI(clientId: string) {
 export async function deployChatbot(clientId: string) {
   await new Promise(resolve => setTimeout(resolve, 2000));
 
-  const fakeEmbedCode = `<script src="https://ai-clinic.saas/widget.js" data-client="${clientId}"></script>`;
+  const fakeEmbedCode = `<script src="https://ai-clinic-saas-eight.vercel.app/widget.js" data-client="${clientId}"></script>`;
 
   await prisma.client.update({
     where: { id: clientId },
