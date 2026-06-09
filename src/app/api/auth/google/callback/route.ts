@@ -35,7 +35,7 @@ export async function GET(req: Request) {
       });
     }
 
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/admin`);
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/dashboard/client/${clientId}`);
   } catch (error) {
     console.error("Error exchanging token:", error);
     return NextResponse.json({ error: "Failed to authenticate" }, { status: 500 });
