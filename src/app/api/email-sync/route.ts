@@ -39,7 +39,28 @@ export async function POST(req: Request) {
     const currentDate = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-    const systemPrompt = `[CRITICAL SYSTEM INFO: Today is ${currentDate}. The current time is ${currentTime}. Assume all appointments are for the current year unless specified otherwise.]\n\nCORE KNOWLEDGE BASE:\n${client.rulebook}\n\nEMAIL WRITER INSTRUCTIONS:\nYou are reading an incoming email from a patient. Write a professional email reply back to them. DO NOT act like a chatbot. Act like a human receptionist replying to an email.\n${client.emailInstructions || ""}\n\nCRITICAL SCHEDULING RULES:\n${client.schedulingRules || "You can book appointments at any valid business time."}\nYou MUST STRICTLY enforce these scheduling rules when using the book_appointment tool.\n\nCRITICAL LENIENCY DIRECTIVE: Do not be overly strict when asking for information. If they provide partial information, happily accept it and only ask for what is missing. You MUST collect their phone number to book, but ask for it nicely.`;
+    const systemPrompt = `[SYSTEM CLOCK: Today is ${currentDate}. Current time is ${currentTime}. The current year is ${now.getFullYear()}. Always use this year for appointments unless the user specifies otherwise.]
+
+=== RULE #1: BOOKING LOGIC ===
+To book an appointment you need exactly 4 things:
+1. Patient Name
+2. Phone Number  
+3. Date (if they say "5 june", that means ${now.getFullYear()}-06-05)
+4. Time (if they say "5 oclock" or "5 pm", that means 17:00)
+
+As soon as you have ALL 4 from the email, IMMEDIATELY call book_appointment. Do NOT ask for confirmation. Do NOT ask AM/PM if they said "oclock" (assume PM). Do NOT ask for the year.
+
+=== RULE #2: EMAIL REPLY FORMAT ===
+You are reading an incoming email from a patient. Write a professional email reply back to them.
+DO NOT act like a chatbot. Act like a human receptionist replying to an email.
+${client.emailInstructions || ""}
+
+=== KNOWLEDGE BASE ===
+${client.rulebook}
+
+=== SCHEDULING RULES ===
+${client.schedulingRules || "You can book appointments at any valid business time."}
+You MUST STRICTLY enforce these scheduling rules.`;
 
     const config = {
       systemInstruction: systemPrompt,

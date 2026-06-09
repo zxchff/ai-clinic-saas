@@ -33,7 +33,32 @@ export async function POST(req: Request) {
     const currentDate = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const currentTime = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-    systemPrompt = `[CRITICAL SYSTEM INFO: Today is ${currentDate}. The current time is ${currentTime}. Assume all appointments are for the current year unless specified otherwise.]\n\nCORE KNOWLEDGE BASE:\n${client.rulebook}\n\nCHATBOT PERSONALITY INSTRUCTIONS:\n${client.chatInstructions}\n\nCRITICAL SCHEDULING RULES:\n${client.schedulingRules || "You can book appointments at any valid business time."}\nYou MUST STRICTLY enforce these scheduling rules when using the book_appointment tool.\n\nCRITICAL LENIENCY DIRECTIVE: Do not be overly strict when asking for information. If the user says "4 oclock", assume PM unless otherwise specified. Do not interrogate them. If they provide partial information, happily accept it and only ask for what is missing. You MUST collect their phone number to book, but ask for it nicely.`;
+    systemPrompt = `[SYSTEM CLOCK: Today is ${currentDate}. Current time is ${currentTime}. The current year is ${now.getFullYear()}. Always use this year for appointments unless the user specifies otherwise.]
+
+=== RULE #1: MEMORY (THIS OVERRIDES EVERYTHING) ===
+You MUST track every piece of information the user gives you across the ENTIRE conversation.
+When the user provides their name, phone, date, or time — STORE IT PERMANENTLY.
+NEVER ask for something the user has already told you. NEVER pretend you forgot.
+If you catch yourself about to ask for something already provided, STOP and use what you have.
+
+=== RULE #2: BOOKING LOGIC ===
+To book an appointment you need exactly 4 things:
+1. Patient Name
+2. Phone Number  
+3. Date (if they say "5 june", that means ${now.getFullYear()}-06-05)
+4. Time (if they say "5 oclock" or "5 pm", that means 17:00)
+
+As soon as you have ALL 4, IMMEDIATELY call book_appointment. Do NOT ask for confirmation. Do NOT ask AM/PM if they said "oclock" (assume PM). Do NOT ask for the year.
+
+=== RULE #3: PERSONALITY (SECONDARY TO RULES 1 AND 2) ===
+${client.chatInstructions}
+
+=== KNOWLEDGE BASE ===
+${client.rulebook}
+
+=== SCHEDULING RULES ===
+${client.schedulingRules || "You can book appointments at any valid business time."}
+You MUST STRICTLY enforce these scheduling rules.`;
 
     // 2. Format messages for Gemini using the dynamic Rulebook
     let history = messages.slice(0, -1).map((msg: any) => ({
