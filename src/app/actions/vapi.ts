@@ -8,11 +8,11 @@ export async function deployVoiceAI(clientId: string) {
     where: { id: clientId }
   });
   
-  if (!client) throw new Error("Client not found");
+  if (!client) return { error: "Client not found" };
 
   const vapiKey = process.env.VAPI_PRIVATE_KEY;
   if (!vapiKey) {
-    throw new Error("VAPI_PRIVATE_KEY is missing from environment variables.");
+    return { error: "VAPI_PRIVATE_KEY is missing from environment variables." };
   }
 
   // 1. Create the Assistant on Vapi
@@ -39,7 +39,7 @@ export async function deployVoiceAI(clientId: string) {
   const assistant = await assistantResponse.json();
   if (assistant.error) {
     console.error("Vapi Assistant Error:", assistant);
-    throw new Error(assistant.message || "Failed to create Vapi assistant");
+    return { error: `Vapi Error: ${assistant.error?.message || assistant.message || "Failed to create Vapi assistant"}` };
   }
 
   // 2. Buy a Phone Number and attach it to the Assistant
@@ -57,9 +57,9 @@ export async function deployVoiceAI(clientId: string) {
   });
 
   const phone = await phoneResponse.json();
-  if (phone.error) {
+  if (phone.error || phone.statusCode >= 400) {
     console.error("Vapi Phone Error:", phone);
-    throw new Error(phone.message || "Failed to purchase Vapi phone number");
+    return { error: `Vapi Billing Error: You must add a credit card to your Vapi.ai account to purchase a phone number! (${phone.message || "Failed"})` };
   }
 
   const realPhoneNumber = phone.number;
