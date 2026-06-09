@@ -22,7 +22,7 @@ model Client {
   emailAuth Boolean  @default(false) // Has connected Google Workspace?
   
   // Portal Access
-  portalToken String @default(cuid())
+  portalToken String? @default(cuid())
 
   // Google Integrations
   googleRefreshToken String?
